@@ -27,3 +27,4 @@ hist(lcdata$SUM, col="lightblue")
 hist(log(lcdata$SUM), col="lightblue")
 
 # bind columns of a discrete student
+# -- waiting on class data
