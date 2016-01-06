@@ -11,9 +11,15 @@ setwd("~/R");
 lcdata <- read.csv(file="StudentCompiled.csv", header=T)
 irdata <- read.csv(file="oire_stu_0915.csv", header=T)
 
+# check for duplicates
+dupes = irdata[duplicated(irdata),]
+dupes[1,]
+length(dupes)
+
+
 # remove duplicate rows
-lcdata <- unique(lcdata)
-irdata <- unique(irdata)
+  #lcdata <- unique(lcdata)
+  #irdata <- unique(irdata)
 
 # check names and dimensions
 names(lcdata)
@@ -33,3 +39,4 @@ hist(log(lcdata$SUM), col="lightblue")
 # merge sets (left join)
 mergedData <- merge(irdata, lcdata, c("TERM_CODE", "COURSE_ACRONYM", "COURSE_NUMBER", 
                                       "LAST_NAME", "FIRST_NAME"), all.x=T)
+
