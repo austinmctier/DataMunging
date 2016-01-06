@@ -8,14 +8,18 @@ setwd("~/R");
 # N/A
 
 # import datasets
-lcdata <- read.csv(file="StudentCompiled.csv", header=T);
-irdata <- read.csv(file="oire_student_07to15.csv", header=T);
+lcdata <- read.csv(file="StudentCompiled.csv", header=T)
+irdata <- read.csv(file="oire_stu_0915.csv", header=T)
+
+# remove duplicate rows
+lcdata <- unique(lcdata)
+irdata <- unique(irdata)
 
 # check names and dimensions
 names(lcdata)
 names(irdata)
-dim(lcdata) # 11945 22
-dim(irdata) # 110915 45
+dim(lcdata)
+dim(irdata)
 
 # visuals
 hist(irdata$SAT_MATH)
@@ -26,5 +30,6 @@ hist(lcdata$SUM)
 hist(lcdata$SUM, col="lightblue")
 hist(log(lcdata$SUM), col="lightblue")
 
-# bind columns of a discrete student
-# -- waiting on class data
+# merge sets (left join)
+mergedData <- merge(irdata, lcdata, c("TERM_CODE", "COURSE_ACRONYM", "COURSE_NUMBER", 
+                                      "LAST_NAME", "FIRST_NAME"), all.x=T)
