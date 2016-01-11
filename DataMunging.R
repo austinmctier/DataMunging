@@ -24,4 +24,4 @@ lcdata$LAST_NAME <- tolower(lcdata$LAST_NAME)
 # merge sets (left join)
 mergedData <- merge(irdata, lcdata, by=c("TERM_CODE","COURSE_ACRONYM", 
                                          "COURSE_NUMBER", "LAST_NAME", 
-                                         "FIRST_NAME"), all.y=T, sort=F)
+                                         "FIRST_NAME"), all.x=T, sort=F)
