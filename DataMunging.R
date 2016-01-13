@@ -1,5 +1,6 @@
 # DATA MUNGING
 # R. Lawson, A. McTier
+# GCSU OIR
 
 # set working directory
 setwd("~/R");
