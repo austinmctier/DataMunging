@@ -8,6 +8,7 @@ setwd("~/R");
 # N/A
 
 # import datasets
+options(stringsAsFactors = FALSE) # don't coerce strings to factors
 lcdata <- read.csv(file="StudentCompiled.csv", header=T)
 irdata <- read.csv(file="oire_student_0915.csv", header=T)
 
