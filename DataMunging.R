@@ -15,6 +15,7 @@ irdata <- read.csv(file="oire_student_0915.csv", header=T)
 # remove duplicate rows (if any)
 dupes <- irdata[duplicated(irdata),]
 irdata <- irdata[!duplicated(irdata),]
+remove(dupes)
 
 # coerce names to lowercase for consistency
 irdata$FIRST_NAME <- tolower(irdata$FIRST_NAME)
