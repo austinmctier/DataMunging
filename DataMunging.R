@@ -220,11 +220,20 @@ mergedData$MAJOR_CHANGES <- lag(mergedData$MAJOR_CHANGES, k=-1)
  # }
 #}
 
- mergedData$BIO_HRS = 0
+ mergedData$BIOL_HRS = 0
  mergedData$CHEM_HRS = 0
  mergedData$MATH_HRS = 0
  mergedData$CSCI_HRS = 0
  mergedData$ASTR_HRS = 0
+ mergedData$ECON_HRS = 0
+ mergedData$ENSC_GEOL_HRS = 0
+ mergedData$GC1Y_HRS = 0
+ mergedData$KINS_HRS = 0
+ mergedData$PHYS_HRS = 0
+ mergedData$LANGUAGE_HRS = 0
+ mergedData$PSYC_HRS = 0
+ mergedData$GEOG_HRS = 0
+ 
  mergedData$PREV_TERM_GPA = 0
  mergedData$SI_IN_CLASS = 0
  mergedData$NUM_SI_TERM = 0
@@ -253,3 +262,22 @@ mergedData$MAJOR_CHANGES <- lag(mergedData$MAJOR_CHANGES, k=-1)
 
  mergedData$PREV_TERM_GPA <- lead(mergedData$PREV_TERM_GPA, k= +1)
  View(mergedData)
+ 
+ for(uniq_stu_id in uniq_stu_ids)
+     {
+             if(mergedData$COURSE_ACRONYM == "FREN" | mergedData$COURSE_ACRONYM == "SPAN")
+                     mergedData$COURSE_ACRONYM == "LANGUAGE"
+            
+}
+for(uniq_stu_id in uniq_stu_ids)
+{
+    if(mergedData$COURSE_ACRONYM == "GEOL" | mergedData$COURSE_ACRONYM == "ENSC")
+        mergedData$COURSE_ACRONYM == "ENSC_GEOL"
+    
+}
+for(uniq_stu_id in uniq_stu_ids)
+ {
+    if(mergedData$COURSE_ACRONYM == "CSCI GC1Y")
+         mergedData$COURSE_ACRONYM == "CSCI"
+     
+ }
