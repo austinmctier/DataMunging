@@ -136,17 +136,17 @@ mergedData$MEDIAN[is.na(mergedData$MEDIAN)] <- 0
 
 # create ordinal variables
 mergedData$STUDENT_LEVEL_NBR <- as.numeric(factor(mergedData$STUDENT_LEVEL_NBR, 
-                                                  +                                                   levels=c(10,20,30,40), 
-                                                  +                                                   ordered=TRUE))
+                                                                                                    levels=c(10,20,30,40), 
+                                                                                                     ordered=TRUE))
 mergedData$FATHER_HIGHEST_GRADE_CODE <- as.numeric(factor(mergedData$FATHER_HIGHEST_GRADE_CODE, 
-                                                          +                                                           levels=c(NA,1,2,3,4), 
-                                                          +                                                           ordered=TRUE))
+                                                                                                                     levels=c(NA,1,2,3,4), 
+                                                                                                                     ordered=TRUE))
 mergedData$MOTHER_HIGHEST_GRADE_CODE <- as.numeric(factor(mergedData$MOTHER_HIGHEST_GRADE_CODE, 
-                                                          +                                                           levels=c(NA,1,2,3,4), 
-                                                          +                                                           ordered=TRUE))
+                                                                                                                     levels=c(NA,1,2,3,4), 
+                                                                                                                     ordered=TRUE))
 mergedData$INST_COURSE_GRADE <- as.numeric(factor(mergedData$INST_COURSE_GRADE, 
-                                                  +                                                   levels=c('F','D','C','B','A'), 
-                                                  +                                                   ordered=TRUE))
+                                                                                                     levels=c('F','D','C','B','A'), 
+                                                                                                   ordered=TRUE))
 imputedData <- amelia(
   x=mergedData,
   m=1,
