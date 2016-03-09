@@ -206,19 +206,19 @@ mergedData$MAJOR_CHANGES <- lag(mergedData$MAJOR_CHANGES, k=-1)
 #mergedData$LAGGED_TERM_GPA = NA
 #....
 
-for(id in ids) {
-  vars = newData[newData$STU_INST_UID == id,names(newData) %in% c("TERM_CODE", "INST_CUM_GPA", "INST_COURSE_GRADE")]
-  vars = vars[order(vars$TERM_CODE),]
-  vars$TERM_CODE = as.numeric(vars$TERM_CODE)
-  vars$STU_INST_UID = as.numeric(vars$STU_INST_UID)
-  for (i in 2:nrow(vars))
-  {
-    vars$COURSE_HRS[vars$TERM_CODE == vars$TERM_CODE[i-1]]
-    vars$GRADE[vars$TERM_CODE == vars$TERM_CODE[i-1]]
+#for(id in ids) {
+ # vars = newData[newData$STU_INST_UID == id,names(newData) %in% c("TERM_CODE", "INST_CUM_GPA", "INST_COURSE_GRADE")]
+  #vars = vars[order(vars$TERM_CODE),]
+  #vars$TERM_CODE = as.numeric(vars$TERM_CODE)
+  #vars$STU_INST_UID = as.numeric(vars$STU_INST_UID)
+  #for (i in 2:nrow(vars))
+  #{
+   # vars$COURSE_HRS[vars$TERM_CODE == vars$TERM_CODE[i-1]]
+   # vars$GRADE[vars$TERM_CODE == vars$TERM_CODE[i-1]]
     #mergedData$LAGGED_TERM_GPA[newData$TERM_CODE == vars$TERM_CODE[i] & newData$STUDENT_INST_ID == id] = calulatedLaggedVariable
-    newData$LAGGED_VARIABLE[newData$TERM_CODE == vars$TERM_CODE[i] & newData$STUDENT_INST_ID == id]
-  }
-}
+   # newData$LAGGED_VARIABLE[newData$TERM_CODE == vars$TERM_CODE[i] & newData$STUDENT_INST_ID == id]
+ # }
+#}
 
  mergedData$BIO_HRS = 0
  mergedData$CHEM_HRS = 0
@@ -232,24 +232,24 @@ for(id in ids) {
  mergedData$CUM_HRS_BY_DEPARTMENT = 0
  mergedData$INST_COURSE_GRADE <- mergedData$INST_COURSE_GRADE - 1
  #pracData$INST_COURSE_GRADE <- pracData$INST_COURSE_GRADE - 1
- pracData$Quality_Points = pracData$COURSE_ATTEMPTED_HRS*pracData$INST_COURSE_GRADE
- View(pracData)
- for(i in 1:nrow(pracData))
-      pracData[i, 'uniq_stu_id'] = paste(pracData[i, 'STU_INST_UID'], pracData[i,'TERM_CODE'])
+ mergedData$Quality_Points = mergedData$COURSE_ATTEMPTED_HRS*mergedData$INST_COURSE_GRADE
+ View(mergedData)
+ for(i in 1:nrow(mergedData))
+      mergedData[i, 'uniq_stu_id'] = paste(mergedData[i, 'STU_INST_UID'], mergedData[i,'TERM_CODE'])
  remove(i)
- uniq_stu_ids <- unique(pracData$uniq_stu_id)
- pracData$NUM_CLASSES = 0
- pracData$TOTAL_QUALITY_POINTS = 0
+ uniq_stu_ids <- unique(mergedData$uniq_stu_id)
+ mergedData$NUM_CLASSES = 0
+ mergedData$TOTAL_QUALITY_POINTS = 0
  for(uniq_stu_id in uniq_stu_ids)
         {
-                 pracData$TOTAL_QUALITY_POINTS[pracData$uniq_stu_id == uniq_stu_id] = sum(pracData$Quality_Points[pracData$uniq_stu_id == uniq_stu_id])
+                 mergedData$TOTAL_QUALITY_POINTS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$Quality_Points[mergedData$uniq_stu_id == uniq_stu_id])
                   
                     }
  for(uniq_stu_id in uniq_stu_ids)
             {
-                          pracData$TOTAL_CRSE_ATMP_HRS[pracData$uniq_stu_id == uniq_stu_id] = sum(pracData$COURSE_ATTEMPTED_HRS[pracData$uniq_stu_id == uniq_stu_id])}
- pracData$PREV_TERM_GPA = pracData$TOTAL_QUALITY_POINTS / pracData$TOTAL_CRSE_ATMP_HRS
- View(pracData)
+                         mergedData$TOTAL_CRSE_ATMP_HRS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$COURSE_ATTEMPTED_HRS[mergedData$uniq_stu_id == uniq_stu_id])}
+ mergedData$PREV_TERM_GPA = mergedData$TOTAL_QUALITY_POINTS / mergedData$TOTAL_CRSE_ATMP_HRS
+ 
 
- pracData$PREV_TERM_GPA <- lead(pracData$PREV_TERM_GPA, k= +1)
+ mergedData$PREV_TERM_GPA <- lead(mergedData$PREV_TERM_GPA, k= +1)
  View(mergedData)
