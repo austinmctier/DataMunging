@@ -275,9 +275,4 @@ for(uniq_stu_id in uniq_stu_ids)
         mergedData$COURSE_ACRONYM == "ENSC_GEOL"
     
 }
-for(uniq_stu_id in uniq_stu_ids)
- {
-    if(mergedData$COURSE_ACRONYM == "CSCI GC1Y")
-         mergedData$COURSE_ACRONYM == "CSCI"
-     
- }
+
