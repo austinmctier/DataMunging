@@ -348,4 +348,4 @@ for(id in stem_ids) {
   
 }
 
-noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29)]
+noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29),]
