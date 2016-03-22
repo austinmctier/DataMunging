@@ -164,7 +164,6 @@ imputedData <- amelia(
     'BRIDGE_IND',
     'GENDER_CODE',
     'WHITE_IND',
-    'MAJOR_IND',
     'DEPENDENCY_CODE'
   ),
   ords=c(
@@ -180,6 +179,7 @@ imputedData <- amelia(
     'COURSE_NUMBER',
     'SI_LEADER',
     'MAJOR_DESC',
+     'MAJOR_IND',
     'COURSE_SEC_IDENTIFIER',
     'STU_INST_UID'
   )
@@ -203,22 +203,7 @@ mergedData$pop <- mergedData$pop/mergedData$landArea
 mergedData$MAJOR_CHANGES <- lag(mergedData$MAJOR_CHANGES, k=-1)
 
 
-#mergedData$LAGGED_TERM_GPA = NA
-#....
 
-#for(id in ids) {
-# vars = newData[newData$STU_INST_UID == id,names(newData) %in% c("TERM_CODE", "INST_CUM_GPA", "INST_COURSE_GRADE")]
-#vars = vars[order(vars$TERM_CODE),]
-#vars$TERM_CODE = as.numeric(vars$TERM_CODE)
-#vars$STU_INST_UID = as.numeric(vars$STU_INST_UID)
-#for (i in 2:nrow(vars))
-#{
-# vars$COURSE_HRS[vars$TERM_CODE == vars$TERM_CODE[i-1]]
-# vars$GRADE[vars$TERM_CODE == vars$TERM_CODE[i-1]]
-#mergedData$LAGGED_TERM_GPA[newData$TERM_CODE == vars$TERM_CODE[i] & newData$STUDENT_INST_ID == id] = calulatedLaggedVariable
-# newData$LAGGED_VARIABLE[newData$TERM_CODE == vars$TERM_CODE[i] & newData$STUDENT_INST_ID == id]
-# }
-#}
 
 mergedData$BIOL_HRS = 0
 mergedData$CHEM_HRS = 0
@@ -268,13 +253,13 @@ for(i in 1:length(pracData$COURSE_ACRONYM))
 }
 
 pracData <- pracData[which(pracData$COURSE_ACRONYM!="NONE"),]
-pracData$COURSE_ACRONYM <- factor(pracData$SI_LEADER, ordered=FALSE)
-table(pracData$COURSE_ACRONYM,useNA = 'ifany')
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'SPAN'] = 'SPAN_FREN'
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'FREN'] = 'SPAN_FREN'
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'CSCI GC1Y'] = 'CSCI'
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'ENSC'] = 'ENSC_GEOL'
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'GEOL'] = 'ENSC_GEOL'
+pracData$COURSE_ACRONYM <- factor(pracData$SI_LEADER, ordered=FALSE)
+table(pracData$COURSE_ACRONYM,useNA = 'ifany')
 pracData$TERM_CODE = as.numeric(pracData$TERM_CODE)
 pracData = pracData[order(pracData$TERM_ORD),]
 ids = unique(pracData$STU_INST_UID)
@@ -315,7 +300,7 @@ for(id in stem_ids) {
   }
 }
 
-> for(id in ids)
+ for(id in ids)
 {
   for(term in terms)
   {
