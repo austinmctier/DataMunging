@@ -349,4 +349,25 @@ for(id in stem_ids) {
   
 }
 
+pracData$Meeting = 0
+
+for(i in 1:nrow(pracData))
+{
+	if(pracData$SI_LEADER != ‘NONE’)
+		pracData$Meeting == 1   (= or ==, not sure)
+	else	                                                     							
+		pracData$Meeting == 0                 
+}
+
+
+for(id in ids)
+{
+	pracData$MEETING_TOTAL[pracData$STU_INST_UID == STU_INST_UID] = sum(pracData$Meeting[pracData$uniq_stu_id == uniq_stu_id])
+
+
+}
+
+no_SI = unique(pracData$STU_INST_UID[pracData$MEETING_TOTAL != 0])
+newData <- pracData[pracData$STU_INST_UID %in% no_SI,]
+
 noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29),]
