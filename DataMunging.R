@@ -234,7 +234,8 @@ mergedData$NUM_CLASSES = 0
 mergedData$TOTAL_QUALITY_POINTS = 0
 for(uniq_stu_id in uniq_stu_ids)
 {
-  mergedData$TOTAL_QUALITY_POINTS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$Quality_Points[mergedData$uniq_stu_id == uniq_stu_id])
+  mergedData$TOTAL_QUALITY_POINTS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$Quality_Points
+  [mergedData$uniq_stu_id == uniq_stu_id])
   
 }
 for(uniq_stu_id in uniq_stu_ids)
