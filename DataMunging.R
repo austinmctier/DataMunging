@@ -272,7 +272,7 @@ pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'FREN'] = 'SPAN_FREN'
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'CSCI GC1Y'] = 'CSCI'
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'ENSC'] = 'ENSC_GEOL'
 pracData$COURSE_ACRONYM[pracData$COURSE_ACRONYM == 'GEOL'] = 'ENSC_GEOL'
-pracData$COURSE_ACRONYM <- factor(pracData$SI_LEADER, ordered=FALSE)
+pracData$COURSE_ACRONYM <- factor(pracData$COURSE_ACRONYM, ordered=FALSE)
 table(pracData$COURSE_ACRONYM,useNA = 'ifany')
 pracData$TERM_CODE = as.numeric(pracData$TERM_CODE)
 pracData = pracData[order(pracData$TERM_ORD),]
@@ -280,6 +280,11 @@ ids = unique(pracData$STU_INST_UID)
 terms = unique(pracData$TERM_CODE)
 treated_ids = unique(pracData$STU_INST_UID[pracData$SI_LEADER != 'NONE'])
 pracData = pracData[pracData$STU_INST_UID %in% treated_ids,]
+
+table(pracData$INST_CUM_HRS_ATTEMPTED, useNA = 'ifany')
+table(pracData$INST_CUM_GPA, useNA = 'ifany')
+table(pracData$MAJOR_CHANGES, useNA = 'ifany')
+table(pracData$INST_CUM_HRS_EARNED, useNA = 'ifany')
 
 stem_majors = c(
   "Environmental Science"  ,        "Computer Science"      ,         "Research and Experimental Psyc"
@@ -363,3 +368,8 @@ for(id in stem_ids) {
 }
 
 noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29),]
+
+table(pracData$INST_CUM_HRS_ATTEMPTED, useNA = 'ifany')
+table(pracData$INST_CUM_GPA, useNA = 'ifany')
+table(pracData$MAJOR_CHANGES, useNA = 'ifany')
+table(pracData$INST_CUM_HRS_EARNED, useNA = 'ifany')
