@@ -45,7 +45,20 @@ remove(dataData)
 remove(lcdata)
 remove(sidata)
 
-names(mergedData)
+mergedData$MAJOR_IND[mergedData$MAJOR_DESC == "Research and Experimental Psyc"] = 4
+
+missing_majs = unique(mergedData$STU_INST_UID[is.na(mergedData$MAJOR_DESC) | is.na(mergedData$MAJOR_IND)])
+
+for (id in missing_majs) {
+  majs = mergedData$MAJOR_DESC[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_DESC) == FALSE]
+  majs = majs[order(mergedData$TERM_CODE[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_DESC) == FALSE ],decreasing=TRUE)]
+  
+  maj_inds = mergedData$MAJOR_DESC[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_IND) == FALSE]
+  maj_inds = maj_inds[order(mergedData$TERM_CODE[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_IND) == FALSE ],decreasing=TRUE)]
+  
+  mergedData$MAJOR_IND[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_IND)] =  maj_inds[1]
+  mergedData$MAJOR_DESC[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_DESC)] =  majs[1]
+}
 
 # drop unwanted variables
 mergedData <- mergedData[,c(
@@ -348,30 +361,5 @@ for(id in stem_ids) {
   }
   
 }
-
-pracData$Meeting = 0
-
-for(i in 1:nrow(pracData))
-{
-	if(pracData$SI_LEADER[i] == ‘NONE’)
-		pracData$Meeting[i] = 0  
-	else	                                                     							
-		pracData$Meeting[i] = 1                
-}
-
-pracData$MEETING_TOTAL = 0
-for(id in ids)
-{
-	for(term in terms)
-	{
-	pracData$MEETING_TOTAL[pracData$STU_INST_UID == id] = sum(pracData$Meeting[pracData$STU_INST_UID == id])
-	pracData$MEETING_TOTAL[pracData$STU_INST_UID == id 
-                      & pracData$TERM_CODE == term] = sum(pracData$Meeting[pracData$STU_INST_UID == id 
-                                                                         & pracData$TERM_CODE <= term])
-                                                                         }
-}
-
-no_SI = unique(pracData$STU_INST_UID[pracData$MEETING_TOTAL != 0])
-newData <- pracData[pracData$STU_INST_UID %in% no_SI,]
 
 noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29),]
