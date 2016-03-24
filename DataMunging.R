@@ -353,18 +353,22 @@ pracData$Meeting = 0
 
 for(i in 1:nrow(pracData))
 {
-	if(pracData$SI_LEADER != ‘NONE’)
-		pracData$Meeting == 1   (= or ==, not sure)
+	if(pracData$SI_LEADER[i] == ‘NONE’)
+		pracData$Meeting[i] = 0  
 	else	                                                     							
-		pracData$Meeting == 0                 
+		pracData$Meeting[i] = 1                
 }
 
-
+pracData$MEETING_TOTAL = 0
 for(id in ids)
 {
-	pracData$MEETING_TOTAL[pracData$STU_INST_UID == STU_INST_UID] = sum(pracData$Meeting[pracData$uniq_stu_id == uniq_stu_id])
-
-
+	for(term in terms)
+	{
+	pracData$MEETING_TOTAL[pracData$STU_INST_UID == id] = sum(pracData$Meeting[pracData$STU_INST_UID == id])
+	pracData$MEETING_TOTAL[pracData$STU_INST_UID == id 
+                      & pracData$TERM_CODE == term] = sum(pracData$Meeting[pracData$STU_INST_UID == id 
+                                                                         & pracData$TERM_CODE <= term])
+                                                                         }
 }
 
 no_SI = unique(pracData$STU_INST_UID[pracData$MEETING_TOTAL != 0])
