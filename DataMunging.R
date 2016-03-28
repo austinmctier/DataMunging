@@ -110,12 +110,13 @@ mergedData$COURSE_SEC_IDENTIFIER <- mergedData$COURSE_SEC_IDENTIFIER.x
 mergedData$COURSE_SEC_IDENTIFIER.x <- NULL
 
 # drop PHYS2211 and GEOL1121 from term 201208
-#mergedData <- mergedData[which(mergedData$TERM_CODE!=201208 & 
-#                                 mergedData$COURSE_ACRONYM!='PHYS' & 
-#                                 mergedData$COURSE_NUMBER!='2211'),]
-#mergedData <- mergedData[which(mergedData$TERM_CODE!=201208 & 
- #                                mergedData$COURSE_ACRONYM!='GEOL' & 
-#                                 mergedData$COURSE_NUMBER!='1121'),]
+mergedData <- mergedData[(mergedData$TERM_CODE == 201208 & 
+                              mergedData$COURSE_ACRONYM =='PHYS' & 
+                              mergedData$COURSE_NUMBER =='2211') == FALSE,]
+ mergedData <- mergedData[(mergedData$TERM_CODE == 201208 & 
+                               mergedData$COURSE_ACRONYM == 'GEOL' & 
+                               mergedData$COURSE_NUMBER == '1121') == FALSE,]
+ 
 
 # drop grades other than A, B, C, D, F
 mergedData <- mergedData[which(mergedData$INST_COURSE_GRADE == 'A' | 
