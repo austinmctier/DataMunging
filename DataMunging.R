@@ -110,12 +110,12 @@ mergedData$COURSE_SEC_IDENTIFIER <- mergedData$COURSE_SEC_IDENTIFIER.x
 mergedData$COURSE_SEC_IDENTIFIER.x <- NULL
 
 # drop PHYS2211 and GEOL1121 from term 201208
-mergedData <- mergedData[which(mergedData$TERM_CODE!=201208 & 
-                                 mergedData$COURSE_ACRONYM!='PHYS' & 
-                                 mergedData$COURSE_NUMBER!='2211'),]
-mergedData <- mergedData[which(mergedData$TERM_CODE!=201208 & 
-                                 mergedData$COURSE_ACRONYM!='GEOL' & 
-                                 mergedData$COURSE_NUMBER!='1121'),]
+#mergedData <- mergedData[which(mergedData$TERM_CODE!=201208 & 
+#                                 mergedData$COURSE_ACRONYM!='PHYS' & 
+#                                 mergedData$COURSE_NUMBER!='2211'),]
+#mergedData <- mergedData[which(mergedData$TERM_CODE!=201208 & 
+ #                                mergedData$COURSE_ACRONYM!='GEOL' & 
+#                                 mergedData$COURSE_NUMBER!='1121'),]
 
 # drop grades other than A, B, C, D, F
 mergedData <- mergedData[which(mergedData$INST_COURSE_GRADE == 'A' | 
@@ -243,7 +243,6 @@ for(i in 1:nrow(mergedData))
   mergedData[i, 'uniq_stu_id'] = paste(mergedData[i, 'STU_INST_UID'], mergedData[i,'TERM_CODE'])
 remove(i)
 uniq_stu_ids <- unique(mergedData$uniq_stu_id)
-mergedData$NUM_CLASSES = 0
 mergedData$TOTAL_QUALITY_POINTS = 0
 for(uniq_stu_id in uniq_stu_ids)
 {
