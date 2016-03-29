@@ -373,3 +373,10 @@ table(pracData$INST_CUM_HRS_ATTEMPTED, useNA = 'ifany')
 table(pracData$INST_CUM_GPA, useNA = 'ifany')
 table(pracData$MAJOR_CHANGES, useNA = 'ifany')
 table(pracData$INST_CUM_HRS_EARNED, useNA = 'ifany')
+
+stu_ids = unique(pracData$STU_INST_UID)
+pracData$survTime = pracData$TERM_ORD
+
+for (id in stu_ids) {
+    pracData$survTime[pracData$STU_INST_UID == id] = pracData$survTime[pracData$STU_INST_UID == id] - min(pracData$survTime[pracData$STU_INST_UID == id])
+}
