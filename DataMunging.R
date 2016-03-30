@@ -209,14 +209,17 @@ ids = unique(pracData$STU_INST_UID)
 terms = unique(pracData$TERM_CODE)
 
 for(id in ids)
-{
-  for(term in terms)
-  {
-    mergedData$INST_CUM_HRS_ATTEMPTED[pracData$STU_INST_UID == id 
-                      & pracData$TERM_CODE == term] <- lag(mergedData$INST_CUM_HRS_ATTEMPTED[pracData$STU_INST_UID == id 
-                      & pracData$TERM_CODE == term], k=-1)
-  }
-}
+       {
+          terms = sort(unique(testData$TERM_CODE[testData$STU_INST_UID == id]))
+                 if(length(terms) > 1)
+               {
+       for(i in 2:length(terms))
+       {
+                  testData$MAJOR_CHANGES_LAGGED[testData$TERM_CODE == terms[i] & testData$STU_INST_UID == id] = testData$MAJOR_CHANGES[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+                  }
+             }
+  
+         }
 
 
 # lag term 
