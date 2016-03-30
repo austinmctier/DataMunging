@@ -204,6 +204,21 @@ remove(imputedData)
 mergedData$TERM_ORD <- factor(mergedData$TERM_ORD, ordered=T)
 mergedData$TERM_ORD <- ts(mergedData$TERM_ORD)
 
+
+ids = unique(pracData$STU_INST_UID)
+terms = unique(pracData$TERM_CODE)
+
+for(id in ids)
+{
+  for(term in terms)
+  {
+    mergedData$INST_CUM_HRS_ATTEMPTED[pracData$STU_INST_UID == id 
+                      & pracData$TERM_CODE == term] <- lag(mergedData$INST_CUM_HRS_ATTEMPTED[pracData$STU_INST_UID == id 
+                      & pracData$TERM_CODE == term], k=-1)
+  }
+}
+
+
 # lag term 
 mergedData$INST_CUM_HRS_ATTEMPTED <- lag(mergedData$INST_CUM_HRS_ATTEMPTED, k=-1)
 mergedData$INST_CUM_GPA <- lag(mergedData$INST_CUM_GPA, k=-1)
@@ -276,8 +291,7 @@ pracData$COURSE_ACRONYM <- factor(pracData$COURSE_ACRONYM, ordered=FALSE)
 table(pracData$COURSE_ACRONYM,useNA = 'ifany')
 pracData$TERM_CODE = as.numeric(pracData$TERM_CODE)
 pracData = pracData[order(pracData$TERM_ORD),]
-ids = unique(pracData$STU_INST_UID)
-terms = unique(pracData$TERM_CODE)
+
 treated_ids = unique(pracData$STU_INST_UID[pracData$SI_LEADER != 'NONE'])
 pracData = pracData[pracData$STU_INST_UID %in% treated_ids,]
 
