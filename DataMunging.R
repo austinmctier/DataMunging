@@ -316,36 +316,36 @@ noFresData$TERM_GPA_LAGGED = 0
 
 for(id in ids)
 {
-  terms = sort(unique(testData$TERM_CODE[testData$STU_INST_UID == id]))
+  terms = sort(unique(noFresData$TERM_CODE[noFresData$STU_INST_UID == id]))
   if(length(terms) > 1)
   {
     for(i in 2:length(terms))
     {
-      testData$INST_CUM_HRS_ATTEMPTED_LAGGED[testData$TERM_CODE == terms[i] & testData$STU_INST_UID == id] = testData$INST_CUM_HRS_ATTEMPTED[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+      noFresData$INST_CUM_HRS_ATTEMPTED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_ATTEMPTED[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
     }
   }
   
 }
 for(id in ids)
 {
-  terms = sort(unique(testData$TERM_CODE[testData$STU_INST_UID == id]))
+  terms = sort(unique(noFresData$TERM_CODE[noFresData$STU_INST_UID == id]))
   if(length(terms) > 1)
   {
     for(i in 2:length(terms))
     {
-      testData$INST_CUM_HRS_EARNED_LAGGED[testData$TERM_CODE == terms[i] & testData$STU_INST_UID == id] = testData$INST_CUM_HRS_EARNED[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+      noFresData$INST_CUM_HRS_EARNED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_EARNED[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
     }
   }
   
 }
 for(id in ids)
 {
-  terms = sort(unique(testData$TERM_CODE[testData$STU_INST_UID == id]))
+  terms = sort(unique(noFresData$TERM_CODE[noFresData$STU_INST_UID == id]))
   if(length(terms) > 1)
   {
     for(i in 2:length(terms))
     {
-      testData$INST_CUM_GPA_LAGGED[testData$TERM_CODE == terms[i] & testData$STU_INST_UID == id] = testData$INST_CUM_GPA[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+      noFresData$INST_CUM_GPA_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_GPA[noFresData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
     }
   }
   
@@ -353,16 +353,18 @@ for(id in ids)
 
 for(id in ids)
 {
-  terms = sort(unique(testData$TERM_CODE[testData$STU_INST_UID == id]))
+  terms = sort(unique(noFresData$TERM_CODE[noFresData$STU_INST_UID == id]))
   if(length(terms) > 1)
   {
     for(i in 2:length(terms))
     {
-      testData$TERM_GPA_LAGGED[testData$TERM_CODE == terms[i] & testData$STU_INST_UID == id] = testData$TERM_GPA[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+      noFresData$TERM_GPA_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$TERM_GPA[noFresData$TERM_CODE == terms[i-1] & noFresData$STU_INST_UID == id]
     }
   }
   
 }
+
+thisData = noFresData
 
 stem_majors = c(
   "Environmental Science"  ,        "Computer Science"      ,         "Research and Experimental Psyc"
@@ -370,29 +372,37 @@ stem_majors = c(
   ,"Web/Multimedia Mgmt & Webmstr" ,"Computer/Information Sci, Gen" 
 )
 
-stem_ids = unique(pracData$STU_INST_UID[pracData$MAJOR_DESC %in% stem_majors])
+stem_ids = unique(thisData$STU_INST_UID[thisData$MAJOR_DESC %in% stem_majors])
 
 for(id in stem_ids) {
-  terms = sort(unique(pracData$TERM_CODE[pracData$STU_INST_UID == id]))
+  terms = sort(unique(thisData$TERM_CODE[thisData$STU_INST_UID == id]))
   
   if (length(terms) == 1) {  
-    pracData$dropped[pracData$TERM_CODE == terms & pracData$STU_INST_UID == id] = 1
+    thisData$dropped[thisData$TERM_CODE == terms & thisData$STU_INST_UID == id] = 1
     next
   }
   decided = 0
   for(i in 2:length(terms)) {
-    last_major =  unique(pracData$MAJOR_DESC[pracData$TERM_CODE == terms[i-1] & pracData$STU_INST_UID == id])
-    cur_major =  unique(pracData$MAJOR_DESC[pracData$TERM_CODE == terms[i] & pracData$STU_INST_UID == id])
+    last_major =  unique(thisData$MAJOR_DESC[thisData$TERM_CODE == terms[i-1] & thisData$STU_INST_UID == id])
+    cur_major =  unique(thisData$MAJOR_DESC[thisData$TERM_CODE == terms[i] & thisData$STU_INST_UID == id])
     if (decided == 0 & last_major %in% stem_majors) {
       decided = 1
     }
     else if (decided == 1 & last_major != cur_major ) {
-      pracData$dropped[pracData$TERM_CODE == terms[i] & pracData$STU_INST_UID == id] = 1
-      pracData = pracData[(pracData$TERM_CODE > terms[i] & pracData$STU_INST_UID == id)== FALSE, ]
+      thisData$dropped[thisData$TERM_CODE == terms[i] & thisData$STU_INST_UID == id] = 1
+      thisData = thisData[(thisData$TERM_CODE > terms[i] & thisData$STU_INST_UID == id)== FALSE, ]
       break
     }
   }
   if (decided == 0) {
-    pracData = pracData[pracData$STU_INST_UID != id,]
+    thisData = thisData[thisData$STU_INST_UID != id,]
   }
 }
+
+for(i in 1:length(thisData$TERM_GPA_LAGGED))
+{
+  if(is.na(thisData$TERM_GPA_LAGGED[i]))
+    thisData$TERM_GPA_LAGGED[i]="NONE"
+}
+
+thisData <- thisData[which(thisData$TERM_GPA_LAGGED!="NONE"),]
