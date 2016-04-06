@@ -306,8 +306,8 @@ noFresData$Quality_Points <- NULL
 noFresData$SI_LEADER <- NULL
 noFresData <- noFresData[!duplicated(noFresData),]
 
-ids = unique(pracData$STU_INST_UID)
-terms = unique(pracData$TERM_CODE)
+ids = unique(noFresData$STU_INST_UID)
+terms = unique(noFresData$TERM_CODE)
 
 noFresData$INST_CUM_HRS_ATTEMPTED_LAGGED = 0
 noFresData$INST_CUM_HRS_EARNED_LAGGED = 0
@@ -406,3 +406,4 @@ for(i in 1:length(thisData$TERM_GPA_LAGGED))
 }
 
 thisData <- thisData[which(thisData$TERM_GPA_LAGGED!="NONE"),]
+
