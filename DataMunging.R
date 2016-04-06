@@ -399,11 +399,5 @@ for(id in stem_ids) {
   }
 }
 
-for(i in 1:length(thisData$TERM_GPA_LAGGED))
-{
-  if(is.na(thisData$TERM_GPA_LAGGED[i]))
-    thisData$TERM_GPA_LAGGED[i]="NONE"
-}
-
-thisData <- thisData[which(thisData$TERM_GPA_LAGGED!="NONE"),]
+thisData <- thisData[which(thisData$TERM_GPA_LAGGED!= 0),]
 
