@@ -373,12 +373,13 @@ stem_majors = c(
 )
 
 stem_ids = unique(thisData$STU_INST_UID[thisData$MAJOR_DESC %in% stem_majors])
+ids = unique(thisData$STU_INST_UID)
 
-for(id in stem_ids) {
+for(id in ids) {
   terms = sort(unique(thisData$TERM_CODE[thisData$STU_INST_UID == id]))
   
   if (length(terms) == 1) {  
-    thisData$dropped[thisData$TERM_CODE == terms & thisData$STU_INST_UID == id] = 1
+    thisData$dropped[thisData$TERM_CODE == terms & thisData$STU_INST_UID == id] = 0
     next
   }
   decided = 0
@@ -388,7 +389,7 @@ for(id in stem_ids) {
     if (decided == 0 & last_major %in% stem_majors) {
       decided = 1
     }
-    else if (decided == 1 & last_major != cur_major ) {
+    else if (decided == 1 & last_major != cur_major & last_major %in% stem_majors ) {
       thisData$dropped[thisData$TERM_CODE == terms[i] & thisData$STU_INST_UID == id] = 1
       thisData = thisData[(thisData$TERM_CODE > terms[i] & thisData$STU_INST_UID == id)== FALSE, ]
       break
