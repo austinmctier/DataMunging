@@ -400,5 +400,33 @@ for(id in ids) {
   }
 }
 
-thisData <- thisData[which(thisData$TERM_GPA_LAGGED!= 0),]
-
+imputedData <- amelia(
+              x=thisData,
+              m=1,
+              logs=c(
+                          'STUDENT_OR_PARENT_AGI'
+                      ),
+        sqrts=c(
+                          'INST_CUM_HRS_ATTEMPTED',
+                          'INST_CUM_HRS_EARNED'
+                      ),
+              noms=c(
+                          'BRIDGE_IND',
+                          'GENDER_CODE',
+                          'WHITE_IND',
+                          'DEPENDENCY_CODE'
+                      ),
+          ords=c(
+                          'STUDENT_LEVEL_NBR',
+                          'FATHER_HIGHEST_GRADE_CODE',
+                          'MOTHER_HIGHEST_GRADE_CODE'
+                          
+                              ),
+              idvars=c(
+                          'TERM_CODE',
+                          'TERM_ORD',
+                          'MAJOR_DESC',
+                          'MAJOR_IND',
+                      'STU_INST_UID'
+                      )
+          )
