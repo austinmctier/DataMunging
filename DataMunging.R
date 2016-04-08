@@ -321,7 +321,7 @@ for(id in ids)
   {
     for(i in 2:length(terms))
     {
-      noFresData$INST_CUM_HRS_ATTEMPTED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_ATTEMPTED[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+      noFresData$INST_CUM_HRS_ATTEMPTED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_ATTEMPTED[testData$TERM_CODE == terms[i-1] & noFresData$STU_INST_UID == id]
     }
   }
   
@@ -333,7 +333,7 @@ for(id in ids)
   {
     for(i in 2:length(terms))
     {
-      noFresData$INST_CUM_HRS_EARNED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_EARNED[testData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+      noFresData$INST_CUM_HRS_EARNED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_EARNED[testData$TERM_CODE == terms[i-1] & noFresData$STU_INST_UID == id]
     }
   }
   
@@ -345,7 +345,7 @@ for(id in ids)
   {
     for(i in 2:length(terms))
     {
-      noFresData$INST_CUM_GPA_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_GPA[noFresData$TERM_CODE == terms[i-1] & testData$STU_INST_UID == id]
+      noFresData$INST_CUM_GPA_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_GPA[noFresData$TERM_CODE == terms[i-1] & noFresData$STU_INST_UID == id]
     }
   }
   
