@@ -198,7 +198,25 @@ for(uniq_stu_id in uniq_stu_ids)
 }
 for(uniq_stu_id in uniq_stu_ids)
 {
-  mergedData$TOTAL_CRSE_ATMP_HRS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$COURSE_ATTEMPTED_HRS[mergedData$uniq_stu_id == uniq_stu_id])}
+  mergedData$TOTAL_CRSE_ATMP_HRS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$COURSE_ATTEMPTED_HRS[mergedData$uniq_stu_id == uniq_stu_id])
+  }
+
+mergedData$SI = 0 
+mergedData$NUM_OF_SI_LEADERS = 0
+
+for(i in 1:length(mergedData$SI))
+{
+  if(mergedData$SI_LEADER[i] != "NONE")
+    mergedData$SI[i] = 1
+}
+
+for(uniq_stu_id in uniq_stu_ids)
+{
+  mergedData$NUM_OF_SI_LEADERS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$SI[mergedData$uniq_stu_id == uniq_stu_id])
+}
+
+mergedData$TERM_GPA = 0
+  
 mergedData$TERM_GPA = mergedData$TOTAL_QUALITY_POINTS / mergedData$TOTAL_CRSE_ATMP_HRS
 
 pracData = mergedData
@@ -232,6 +250,7 @@ table(pracData$INST_CUM_HRS_EARNED, useNA = 'ifany')
 
 noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29),]
 
+noFresData$TOTAL_SIs = 0
 ids = unique(noFresData$STU_INST_UID)
 terms = unique(noFresData$TERM_CODE)
 for(id in ids)
@@ -282,6 +301,16 @@ for(id in ids)
   
 }
 
+for(id in ids)
+{
+for(term in terms)
+{
+noFresData$TOTAL_SIs[noFresData$STU_INST_UID == id 
+                        & noFresData$TERM_CODE == term] = sum(noFresData$SI[noFresData$STU_INST_UID == id 
+                                                                                    & noFresData$TERM_CODE <= term])
+}
+}
+
 table(noFresData$INST_CUM_HRS_ATTEMPTED, useNA = 'ifany')
 table(noFresData$INST_CUM_GPA, useNA = 'ifany')
 table(noFresData$MAJOR_CHANGES, useNA = 'ifany')
@@ -301,6 +330,8 @@ noFresData$INST_COURSE_GRADE <- NULL
 noFresData$TOTAL <- NULL
 noFresData$MEDIAN <- NULL
 noFresData$MEAN <- NULL
+noFresData$SI <- NULL
+noFresData$uniq_stu_id <- NULL
 noFresData$COURSE_SEC_IDENTIFIER <- NULL
 noFresData$Quality_Points <- NULL
 noFresData$SI_LEADER <- NULL
@@ -400,18 +431,25 @@ for(id in ids) {
   }
 }
 
+stemData <- thisData[which(thisData$INST_CUM_HRS_ATTEMPTED_LAGGED != 0),]
+
+stemData$dropped <- NULL
+ stemData$INST_CUM_HRS_EARNED <- NULL
+stemData$INST_CUM_GPA <- NULL
+ stemData$INST_CUM_HRS_ATTEMPTED <- NULL
+
+
 imputedData <- amelia(
-              x=thisData,
+              x=stemData,
               m=1,
               logs=c(
                           'STUDENT_OR_PARENT_AGI'
                       ),
         sqrts=c(
-                          'INST_CUM_HRS_ATTEMPTED',
-                          'INST_CUM_HRS_EARNED'
+                          'INST_CUM_HRS_ATTEMPTED_LAGGED',
+                          'INST_CUM_HRS_EARNED_LAGGED'
                       ),
               noms=c(
-                          'BRIDGE_IND',
                           'GENDER_CODE',
                           'WHITE_IND',
                           'DEPENDENCY_CODE'
@@ -430,3 +468,6 @@ imputedData <- amelia(
                       'STU_INST_UID'
                       )
           )
+          
+           stemData <- imputedData$imputations[[1]]
+  remove(imputedData)
