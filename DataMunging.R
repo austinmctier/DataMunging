@@ -132,13 +132,20 @@ mergedData$DEPENDENCY_CODE <- factor(mergedData$DEPENDENCY_CODE, ordered=TRUE)
 mergedData$MAJOR_DESC <- factor(mergedData$MAJOR_DESC, ordered=FALSE)
 mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
 mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
-for(i in 1:length(mergedData$SI_LEADER))
-{
-  if(is.na(mergedData$SI_LEADER[i]))
-    mergedData$SI_LEADER[i]="NONE"
-}
+mergedData$SI_LEADER[is.na(mergedData$SI_LEADER)] <- "NONE"
 mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
 mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
+mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
+mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
+mergedData$COURSE_ACRONYM <- factor(mergedData$COURSE_ACRONYM, ordered=FALSE)
+mergedData$COURSE_NUMBER <- factor(mergedData$COURSE_NUMBER, ordered=FALSE)
+mergedData$BRIDGE_IND <- factor(mergedData$BRIDGE_IND, ordered=TRUE)
+mergedData$GENDER_CODE <- factor(mergedData$GENDER_CODE, ordered=TRUE)
+mergedData$WHITE_IND <- factor(mergedData$WHITE_IND, ordered=TRUE)
+mergedData$DEPENDENCY_CODE <- factor(mergedData$DEPENDENCY_CODE, ordered=TRUE)
+mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
+mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
+mergedData$MAJOR_IND[is.na(mergedData$MAJOR_IND)] <- 14
 
 # treat nas as zeros
 mergedData$TOTAL[is.na(mergedData$TOTAL)] <- 0
@@ -164,6 +171,7 @@ mergedData$pop_over25_bachelors <- mergedData$pop_over25_bachelors/mergedData$po
 mergedData$pop_armedForces <- mergedData$pop_armedForces/mergedData$pop_over16
 mergedData$pop_density <- mergedData$pop/mergedData$landArea
 
+
 mergedData$BIOL_HRS = 0
 mergedData$CHEM_HRS = 0
 mergedData$MATH_HRS = 0
@@ -178,7 +186,6 @@ mergedData$SPAN_FREN_HRS = 0
 mergedData$PSYC_HRS = 0
 mergedData$GEOG_HRS = 0
 
-mergedData$PREV_TERM_GPA = 0
 
 
 mergedData$INST_COURSE_GRADE <- mergedData$INST_COURSE_GRADE - 1
@@ -201,19 +208,29 @@ for(uniq_stu_id in uniq_stu_ids)
   mergedData$TOTAL_CRSE_ATMP_HRS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$COURSE_ATTEMPTED_HRS[mergedData$uniq_stu_id == uniq_stu_id])
   }
 
-mergedData$SI = 0 
+mergedData$ANY_SI = 0 
 mergedData$NUM_OF_SI_LEADERS = 0
+
 
 for(i in 1:length(mergedData$SI))
 {
   if(mergedData$SI_LEADER[i] != "NONE")
-    mergedData$SI[i] = 1
+    mergedData$ANY_SI[i] = 1
+}
+
+
+
+for(uniq_stu_id in uniq_stu_ids)
+{
+  mergedData$NUM_OF_SI_LEADERS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$ANY_SI[mergedData$uniq_stu_id == uniq_stu_id])
 }
 
 for(uniq_stu_id in uniq_stu_ids)
 {
-  mergedData$NUM_OF_SI_LEADERS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$SI[mergedData$uniq_stu_id == uniq_stu_id])
+  mergedData$TOTAL_VISITS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$TOTAL[mergedData$uniq_stu_id == uniq_stu_id])
 }
+
+
 
 mergedData$TERM_GPA = 0
   
@@ -237,6 +254,35 @@ pracData$COURSE_ACRONYM <- factor(pracData$COURSE_ACRONYM, ordered=FALSE)
 table(pracData$COURSE_ACRONYM,useNA = 'ifany')
 pracData$TERM_CODE = as.numeric(pracData$TERM_CODE)
 pracData = pracData[order(pracData$TERM_ORD),]
+
+#mergedData$SI_ASTR = 0
+#mergedData$SI_BIOL = 0
+#mergedData$SI_CHEM = 0
+#mergedData$SI_CSCI = 0
+#mergedData$SI_ECON = 0
+#mergedData$SI_ENSC_GEOL = 0
+#mergedData$SI_SPAN_FREN = 0
+#mergedData$SI_GEOG = 0
+#mergedData$SI_KINS = 0
+#mergedData$SI_MATH = 0
+#ergedData$SI_PHSC = 0
+#mergedData$SI_PHYS = 0
+#mergedData$SI_PSYC = 0
+
+#for(i in 1:length(mergedData$SI))
+#{
+#  if(mergedData$SI_LEADER[i] != "NONE")
+#    mergedData$SI[i] = 1
+#}
+#for(i in 1:length(mergedData$SI))
+#{
+#  if(mergedData$SI_LEADER[i] != "NONE" & mergedData$COURSE_ACRONYM == "ASTR")
+   # mergedData$SI_ASTR = 1
+   #  if(mergedData$SI_LEADER[i] != "NONE" & mergedData$COURSE_ACRONYM == "BIOL")
+   # mergedData$SI_BIOL = 1
+   #  if(mergedData$SI_LEADER[i] != "NONE" & mergedData$COURSE_ACRONYM == "CHEM")
+   # mergedData$SI_CHEM = 1
+#}
 
 treated_ids = unique(pracData$STU_INST_UID[pracData$SI_LEADER != 'NONE'])
 pracData = pracData[pracData$STU_INST_UID %in% treated_ids,]
@@ -306,7 +352,7 @@ for(id in ids)
 for(term in terms)
 {
 noFresData$TOTAL_SIs[noFresData$STU_INST_UID == id 
-                        & noFresData$TERM_CODE == term] = sum(noFresData$SI[noFresData$STU_INST_UID == id 
+                        & noFresData$TERM_CODE == term] = sum(noFresData$ANY_SI[noFresData$STU_INST_UID == id 
                                                                                     & noFresData$TERM_CODE <= term])
 }
 }
@@ -437,6 +483,7 @@ stemData$dropped <- NULL
  stemData$INST_CUM_HRS_EARNED <- NULL
 stemData$INST_CUM_GPA <- NULL
  stemData$INST_CUM_HRS_ATTEMPTED <- NULL
+ stemData$BRIDGE_IND <- NULL
 
 
 imputedData <- amelia(
@@ -471,3 +518,24 @@ imputedData <- amelia(
           
            stemData <- imputedData$imputations[[1]]
   remove(imputedData)
+
+#attach(stemData)
+#my.surv <- Surv(stemData$survTime, stemData$MAJOR_CHANGES)
+#coxph.fit <- coxph(my.surv ~ , method = "breslow", data=stemData)
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
