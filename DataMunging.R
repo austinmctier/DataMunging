@@ -10,6 +10,7 @@ library(ordinal)
 library(car)
 library(stats)
 library(dplyr)
+library(survival)
 
 # import datasets
 options(stringsAsFactors = FALSE) # don't coerce strings to factors
@@ -58,7 +59,20 @@ for (id in missing_majs) {
 }
 
 # drop unwanted variables
-mergedData <- mergedData[,c(
+# drop unwanted variables
+names(mergedData)[names(mergedData) == 'income_househould_median'] = 'income_household_median'
+
+mergedData$ACTIVITY =  0
+mergedData$ACTIVITY[mergedData$ACTIVITY_NCAA_IND == 1 | mergedData$ACTIVITY_GREEK_IND == 1 | mergedData$ACTIVITY_ACADM_IND == 1] = 1
+mergedData$IPEDS_RACE_CODE[mergedData$IPEDS_RACE_CODE %in% c('I','M','A','P','U','T','U','Z','N')] = 'OTHER'
+# create proportions for population variables
+
+select =  c(
+  'pop_over25','pop_over16','pop','landArea',
+  'GIVE_HRS',
+  'income_household_median',
+  'home_medianValue','pop_black',
+  'ACTIVITY','SUMMER_CNT',
   'TERM_CODE',
   'STU_INST_UID',
   'COURSE_ACRONYM',
@@ -73,7 +87,7 @@ mergedData <- mergedData[,c(
   'ACT_COMPOSITE',
   'BRIDGE_IND',
   'GENDER_CODE',
-  'WHITE_IND',
+  'IPEDS_RACE_CODE',
   'NN_GRANT',
   'NR_GRANT',
   'LOAN',
@@ -90,21 +104,17 @@ mergedData <- mergedData[,c(
   'MEAN',
   'MAJOR_IND',
   'pop_over25_bachelors',
-  'pop_over25',
-  'pop_over16',
   'pop_armedForces',
   'pop_over25_HSGrad',
   'AGE',
   'MAJOR_CHANGES',
-  'landArea',
   'TERM_ORD',
   'INST_CUM_HRS_EARNED',
   'pop',
-  'COURSE_SEC_IDENTIFIER.x'
-)]
+  'COURSE_SEC_IDENTIFIER'
+)
 
-mergedData$COURSE_SEC_IDENTIFIER <- mergedData$COURSE_SEC_IDENTIFIER.x
-mergedData$COURSE_SEC_IDENTIFIER.x <- NULL
+mergedData <- mergedData[,names(mergedData) %in% select]
 
 # drop PHYS2211 and GEOL1121 from term 201208
 mergedData <- mergedData[(mergedData$TERM_CODE == 201208 & 
@@ -127,22 +137,16 @@ mergedData$COURSE_ACRONYM <- factor(mergedData$COURSE_ACRONYM, ordered=FALSE)
 mergedData$COURSE_NUMBER <- factor(mergedData$COURSE_NUMBER, ordered=FALSE)
 mergedData$BRIDGE_IND <- factor(mergedData$BRIDGE_IND, ordered=TRUE)
 mergedData$GENDER_CODE <- factor(mergedData$GENDER_CODE, ordered=TRUE)
-mergedData$WHITE_IND <- factor(mergedData$WHITE_IND, ordered=TRUE)
+mergedData$IPEDS_RACE_CODE <- factor(mergedData$IPEDS_RACE_CODE, ordered=FALSE)
+mergedData$IPEDS_RACE_CODE = relevel(mergedData$IPEDS_RACE_CODE,ref='W')
 mergedData$DEPENDENCY_CODE <- factor(mergedData$DEPENDENCY_CODE, ordered=TRUE)
-mergedData$MAJOR_DESC <- factor(mergedData$MAJOR_DESC, ordered=FALSE)
 mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
 mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
-mergedData$SI_LEADER[is.na(mergedData$SI_LEADER)] <- "NONE"
+
+# change NA's in SI_LEADER to "NONE"
+#mergedData$SI_LEADER[is.na(mergedData$SI_LEADER)] <- "NONE"
 mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
-mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
-mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
-mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
-mergedData$COURSE_ACRONYM <- factor(mergedData$COURSE_ACRONYM, ordered=FALSE)
-mergedData$COURSE_NUMBER <- factor(mergedData$COURSE_NUMBER, ordered=FALSE)
-mergedData$BRIDGE_IND <- factor(mergedData$BRIDGE_IND, ordered=TRUE)
-mergedData$GENDER_CODE <- factor(mergedData$GENDER_CODE, ordered=TRUE)
-mergedData$WHITE_IND <- factor(mergedData$WHITE_IND, ordered=TRUE)
-mergedData$DEPENDENCY_CODE <- factor(mergedData$DEPENDENCY_CODE, ordered=TRUE)
+#mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
 mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
 mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
 mergedData$MAJOR_IND[is.na(mergedData$MAJOR_IND)] <- 14
@@ -189,7 +193,7 @@ mergedData$GEOG_HRS = 0
 
 
 mergedData$INST_COURSE_GRADE <- mergedData$INST_COURSE_GRADE - 1
-#pracData$INST_COURSE_GRADE <- pracData$INST_COURSE_GRADE - 1
+
 mergedData$Quality_Points = mergedData$COURSE_ATTEMPTED_HRS*mergedData$INST_COURSE_GRADE
 View(mergedData)
 for(i in 1:nrow(mergedData))
@@ -289,7 +293,7 @@ pracData = pracData[pracData$STU_INST_UID %in% treated_ids,]
 
 table(pracData$INST_CUM_HRS_ATTEMPTED, useNA = 'ifany')
 table(pracData$INST_CUM_GPA, useNA = 'ifany')
-table(pracData$MAJOR_CHANGES, useNA = 'ifany')
+table(pracData$MAJOR_CHANGES, useNA = 'ifany') 
 table(pracData$INST_CUM_HRS_EARNED, useNA = 'ifany')
 
 
@@ -477,6 +481,7 @@ for(id in ids) {
   }
 }
 
+plot.ROC
 stemData <- thisData[which(thisData$INST_CUM_HRS_ATTEMPTED_LAGGED != 0),]
 
 stemData$dropped <- NULL
