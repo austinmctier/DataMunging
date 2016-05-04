@@ -133,9 +133,7 @@ mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
 mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
 
 # change NA's in SI_LEADER to "NONE"
-#mergedData$SI_LEADER[is.na(mergedData$SI_LEADER)] <- "NONE"
 mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
-#mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
 
 # treat nas as zeros
 mergedData$TOTAL[is.na(mergedData$TOTAL)] <- 0
@@ -159,10 +157,6 @@ mergedData$TERM_ORD <- ts(mergedData$TERM_ORD)
 
 ids = unique(mergedData$STU_INST_UID)
 terms = unique(mergedData$TERM_CODE)
-
-#sorted = sort(unique(mergedData$TERM_CODE[mergedData$STU_INST_UID == id]),descending=TRUE)
-#max = sorted[1]
-#almost_max = sorted[2]
 
 for(id in ids)
 {
@@ -395,7 +389,6 @@ for (id in missing_majs) {
 }
 
 # drop unwanted variables
-# drop unwanted variables
 names(mergedData)[names(mergedData) == 'income_househould_median'] = 'income_household_median'
 
 mergedData$ACTIVITY =  0
@@ -480,9 +473,8 @@ mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
 mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
 
 # change NA's in SI_LEADER to "NONE"
-#mergedData$SI_LEADER[is.na(mergedData$SI_LEADER)] <- "NONE"
+
 mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
-#mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
 mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
 mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
 mergedData$MAJOR_IND[is.na(mergedData$MAJOR_IND)] <- 14
@@ -595,35 +587,6 @@ table(pracData$COURSE_ACRONYM,useNA = 'ifany')
 pracData$TERM_CODE = as.numeric(pracData$TERM_CODE)
 pracData = pracData[order(pracData$TERM_ORD),]
 
-#mergedData$SI_ASTR = 0
-#mergedData$SI_BIOL = 0
-#mergedData$SI_CHEM = 0
-#mergedData$SI_CSCI = 0
-#mergedData$SI_ECON = 0
-#mergedData$SI_ENSC_GEOL = 0
-#mergedData$SI_SPAN_FREN = 0
-#mergedData$SI_GEOG = 0
-#mergedData$SI_KINS = 0
-#mergedData$SI_MATH = 0
-#ergedData$SI_PHSC = 0
-#mergedData$SI_PHYS = 0
-#mergedData$SI_PSYC = 0
-
-#for(i in 1:length(mergedData$SI))
-#{
-#  if(mergedData$SI_LEADER[i] != "NONE")
-#    mergedData$SI[i] = 1
-#}
-#for(i in 1:length(mergedData$SI))
-#{
-#  if(mergedData$SI_LEADER[i] != "NONE" & mergedData$COURSE_ACRONYM == "ASTR")
-   # mergedData$SI_ASTR = 1
-   #  if(mergedData$SI_LEADER[i] != "NONE" & mergedData$COURSE_ACRONYM == "BIOL")
-   # mergedData$SI_BIOL = 1
-   #  if(mergedData$SI_LEADER[i] != "NONE" & mergedData$COURSE_ACRONYM == "CHEM")
-   # mergedData$SI_CHEM = 1
-#}
-
 treated_ids = unique(pracData$STU_INST_UID[pracData$SI_LEADER != 'NONE'])
 pracData = pracData[pracData$STU_INST_UID %in% treated_ids,]
 
@@ -639,6 +602,7 @@ noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29),]
 noFresData$TOTAL_SIs = 0
 ids = unique(noFresData$STU_INST_UID)
 terms = unique(noFresData$TERM_CODE)
+
 for(id in ids)
 {
   for(term in terms)
@@ -682,30 +646,19 @@ for(id in ids)
     noFresData$SPAN_FREN_HRS[noFresData$STU_INST_UID == id 
                              & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                     & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "SPAN_FREN"])
+    noFresData$TOTAL_SIs[noFresData$STU_INST_UID == id 
+                        & noFresData$TERM_CODE == term] = sum(noFresData$ANY_SI[noFresData$STU_INST_UID == id 
+                                                                                    & noFresData$TERM_CODE <= term])
     
   }
   
 }
 
-for(id in ids)
-{
-for(term in terms)
-{
-noFresData$TOTAL_SIs[noFresData$STU_INST_UID == id 
-                        & noFresData$TERM_CODE == term] = sum(noFresData$ANY_SI[noFresData$STU_INST_UID == id 
-                                                                                    & noFresData$TERM_CODE <= term])
-}
-}
-
-table(noFresData$INST_CUM_HRS_ATTEMPTED, useNA = 'ifany')
-table(noFresData$INST_CUM_GPA, useNA = 'ifany')
-table(noFresData$MAJOR_CHANGES, useNA = 'ifany')
-table(noFresData$INST_CUM_HRS_EARNED, useNA = 'ifany')
-
 stu_ids = unique(noFresData$STU_INST_UID)
 noFresData$survTime = noFresData$TERM_ORD
 
-for (id in stu_ids) {
+for (id in stu_ids) 
+{
   noFresData$survTime[noFresData$STU_INST_UID == id] = noFresData$survTime[noFresData$STU_INST_UID == id] - min(noFresData$survTime[noFresData$STU_INST_UID == id])
 }
 
@@ -721,6 +674,7 @@ noFresData$uniq_stu_id <- NULL
 noFresData$COURSE_SEC_IDENTIFIER <- NULL
 noFresData$Quality_Points <- NULL
 noFresData$SI_LEADER <- NULL
+noFresData$ANY_SI <- NULL
 noFresData <- noFresData[!duplicated(noFresData),]
 
 ids = unique(noFresData$STU_INST_UID)
@@ -730,6 +684,7 @@ noFresData$INST_CUM_HRS_ATTEMPTED_LAGGED = 0
 noFresData$INST_CUM_HRS_EARNED_LAGGED = 0
 noFresData$INST_CUM_GPA_LAGGED = 0
 noFresData$TERM_GPA_LAGGED = 0
+
 
 for(id in ids)
 {
@@ -741,11 +696,6 @@ for(id in ids)
       noFresData$INST_CUM_HRS_ATTEMPTED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_ATTEMPTED[noFresData$TERM_CODE == terms[i-1] & noFresData$STU_INST_UID == id]
     }
   }
-  
-}
-for(id in ids)
-{
-  terms = sort(unique(noFresData$TERM_CODE[noFresData$STU_INST_UID == id]))
   if(length(terms) > 1)
   {
     for(i in 2:length(terms))
@@ -753,11 +703,6 @@ for(id in ids)
       noFresData$INST_CUM_HRS_EARNED_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_HRS_EARNED[noFresData$TERM_CODE == terms[i-1] & noFresData$STU_INST_UID == id]
     }
   }
-  
-}
-for(id in ids)
-{
-  terms = sort(unique(noFresData$TERM_CODE[noFresData$STU_INST_UID == id]))
   if(length(terms) > 1)
   {
     for(i in 2:length(terms))
@@ -765,12 +710,6 @@ for(id in ids)
       noFresData$INST_CUM_GPA_LAGGED[noFresData$TERM_CODE == terms[i] & noFresData$STU_INST_UID == id] = noFresData$INST_CUM_GPA[noFresData$TERM_CODE == terms[i-1] & noFresData$STU_INST_UID == id]
     }
   }
-  
-}
-
-for(id in ids)
-{
-  terms = sort(unique(noFresData$TERM_CODE[noFresData$STU_INST_UID == id]))
   if(length(terms) > 1)
   {
     for(i in 2:length(terms))
@@ -780,6 +719,8 @@ for(id in ids)
   }
   
 }
+
+
 
 thisData = noFresData
 
@@ -792,32 +733,42 @@ stem_majors = c(
 stem_ids = unique(thisData$STU_INST_UID[thisData$MAJOR_DESC %in% stem_majors])
 ids = unique(thisData$STU_INST_UID)
 
-for(id in ids) {
+for(id in ids) 
+{
   terms = sort(unique(thisData$TERM_CODE[thisData$STU_INST_UID == id]))
+  max = terms[1]
+  almost_max = terms[2]
+
   
-  if (length(terms) == 1) {  
+  if (length(terms) == 1) 
+    {  
     thisData$dropped[thisData$TERM_CODE == terms & thisData$STU_INST_UID == id] = 0
     next
-  }
+    }
   decided = 0
-  for(i in 2:length(terms)) {
+  for(i in 2:length(terms)) 
+  {
     last_major =  unique(thisData$MAJOR_DESC[thisData$TERM_CODE == terms[i-1] & thisData$STU_INST_UID == id])
     cur_major =  unique(thisData$MAJOR_DESC[thisData$TERM_CODE == terms[i] & thisData$STU_INST_UID == id])
-    if (decided == 0 & last_major %in% stem_majors) {
+    if (decided == 0 & last_major %in% stem_majors) 
+    {
       decided = 1
     }
-    else if (decided == 1 & last_major != cur_major & last_major %in% stem_majors ) {
+    else if (decided == 1 & last_major != cur_major & last_major %in% stem_majors ) 
+    {
       thisData$dropped[thisData$TERM_CODE == terms[i] & thisData$STU_INST_UID == id] = 1
       thisData = thisData[(thisData$TERM_CODE > terms[i] & thisData$STU_INST_UID == id)== FALSE, ]
       break
     }
   }
-  if (decided == 0) {
+  if (decided == 0) 
+  {
     thisData = thisData[thisData$STU_INST_UID != id,]
   }
+  lastmajor
+  almostLM = 
 }
 
-plot.ROC
 stemData <- thisData[which(thisData$INST_CUM_HRS_ATTEMPTED_LAGGED != 0),]
 
 stemData$dropped <- NULL
@@ -826,12 +777,51 @@ stemData$INST_CUM_GPA <- NULL
  stemData$INST_CUM_HRS_ATTEMPTED <- NULL
  stemData$BRIDGE_IND <- NULL
 
+imputedData <- amelia(
+    x=mergedData,
+    m=1,
+    logs=c(
+        'STUDENT_OR_PARENT_AGI',
+        'income_household_median',
+        'home_medianValue','pop','landArea','pop_over25','pop_over16'
+    ),
+    sqrts=c(
+        'INST_CUM_HRS_ATTEMPTED',
+        'INST_CUM_HRS_EARNED'
+    ),
+    nom=c(
+        'BRIDGE_IND',
+        'GENDER_CODE',
+        'NR_GRANT',
+        'NN_GRANT',
+        'IPEDS_RACE_CODE',
+        'DEPENDENCY_CODE',
+        'ACTIVITY'
+    ),
+    ords=c(
+        'FATHER_HIGHEST_GRADE_CODE',
+        'MOTHER_HIGHEST_GRADE_CODE',
+        'INST_COURSE_GRADE'
+    ),
+    idvars=c(
+        'MAJOR_DESC',
+        'TERM_CODE',
+        'TERM_ORD',
+        'COURSE_ACRONYM',
+        'COURSE_NUMBER',
+        'COURSE_SEC_IDENTIFIER',
+        'STU_INST_UID',
+       
+    )
+)
 
 imputedData <- amelia(
               x=stemData,
               m=1,
               logs=c(
-                          'STUDENT_OR_PARENT_AGI'
+                          'STUDENT_OR_PARENT_AGI',
+        'income_household_median',
+        'home_medianValue','pop','landArea','pop_over25','pop_over16'
                       ),
         sqrts=c(
                           'INST_CUM_HRS_ATTEMPTED_LAGGED',
@@ -839,7 +829,7 @@ imputedData <- amelia(
                       ),
               noms=c(
                           'GENDER_CODE',
-                          'WHITE_IND',
+                          'IPEDS_RACE_CODE',
                           'DEPENDENCY_CODE'
                       ),
           ords=c(
