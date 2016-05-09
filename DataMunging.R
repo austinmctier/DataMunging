@@ -656,10 +656,12 @@ for(id in ids)
 
 stu_ids = unique(noFresData$STU_INST_UID)
 noFresData$survTime = noFresData$TERM_ORD
+noFresData$T1 = 0
 
 for (id in stu_ids) 
 {
   noFresData$survTime[noFresData$STU_INST_UID == id] = noFresData$survTime[noFresData$STU_INST_UID == id] - min(noFresData$survTime[noFresData$STU_INST_UID == id])
+  noFresData$
 }
 
 noFresData$COURSE_ACRONYM <- NULL
@@ -721,7 +723,6 @@ for(id in ids)
 }
 
 
-
 thisData = noFresData
 
 stem_majors = c(
@@ -736,8 +737,6 @@ ids = unique(thisData$STU_INST_UID)
 for(id in ids) 
 {
   terms = sort(unique(thisData$TERM_CODE[thisData$STU_INST_UID == id]))
-  max = terms[1]
-  almost_max = terms[2]
 
   
   if (length(terms) == 1) 
@@ -765,8 +764,26 @@ for(id in ids)
   {
     thisData = thisData[thisData$STU_INST_UID != id,]
   }
-  lastmajor
-  almostLM = 
+  
+}
+thisData$CHANGED_MAJOR = 1
+
+for(id in ids)
+{
+ sorted = sort(unique(thisData$TERM_ORD[thisData$STU_INST_UID == id], decreasing = TRUE))
+ max = sorted[1]
+ almost_max = sorted[2]
+ lastMajor = thisData$MAJOR_DESC[thisData$STU_INST_UID == id & thisData$TERM_ORD == max]
+ almostLM = thisData$MAJOR_DESC[thisData$STU_INST_UID == id & thisData$TERM_ORD == almost_max]
+ if ((grepl(almostLM, lastMajor)) | (grepl(almostLM, 'Psychology, General') & grepl(lastMajor, 'Research and Experimental Psyc')) == TRUE)
+ {
+  thisData$CHANGED_MAJOR[thisData$STU_INST_UID == id & thisData$TERM_ORD == max] = 0
+ }
+ else
+ {
+ thisData$CHANGED_MAJOR[thisData$STU_INST_UID == id & thisData$TERM_ORD == max] = 1
+ }
+
 }
 
 stemData <- thisData[which(thisData$INST_CUM_HRS_ATTEMPTED_LAGGED != 0),]
