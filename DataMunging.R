@@ -142,7 +142,7 @@ mergedData$MEDIAN[is.na(mergedData$MEDIAN)] <- 0
 mergedData$MAJOR_IND[is.na(mergedData$MAJOR_IND)] <- 11
 
 
-survivalData <- mergedData
+workData <- mergedData
 
 # create ordinal variables
 mergedData$FATHER_HIGHEST_GRADE_CODE <- as.numeric(factor(mergedData$FATHER_HIGHEST_GRADE_CODE, 
@@ -272,7 +272,7 @@ mergedData$COURSE_ACRONYM = as.character(mergedData$COURSE_ACRONYM)
 mergedData$IPEDS_RACE_CODE <- factor(mergedData$IPEDS_RACE_CODE, ordered=FALSE)
 mergedData$IPEDS_RACE_CODE = relevel(mergedData$IPEDS_RACE_CODE,ref='W')
 mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
-mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
+mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="11")
 
 # create proportions for population variables
 mergedData$pop_over25_HSGrad <- mergedData$pop_over25_HSGrad/mergedData$pop_over25
@@ -345,7 +345,9 @@ PSMData <- mergedData
 
 backupData <- mergedData
 
-
+PSM_ids = unique(PSMData$STU_INST_UID)
+  
+  survivalData = workData[workData$STU_INST_UID %in% PSM_ids,]
 # create ordinal variables
 survivalData$STUDENT_LEVEL_NBR <- as.numeric(factor(survivalData$STUDENT_LEVEL_NBR, 
                                                   levels=c(10,20,30,40), 
@@ -459,7 +461,7 @@ table(pracData$INST_CUM_HRS_EARNED, useNA = 'ifany')
 
 
 
-noFresData = pracData[which(pracData$INST_CUM_HRS_ATTEMPTED > 29),]
+noFresData = pracData[which(pracData$INST_CUM_HRS_EARNED > 29),]
 
 noFresData$TOTAL_SIs = 0
 ids = unique(noFresData$STU_INST_UID)
@@ -469,43 +471,43 @@ for(id in ids)
 {
   for(term in terms)
   {
-    noFresData$BIOL_HRS[noFresData$STU_INST_UID == id 
+    noFresData$BIOL_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "BIOL"])
-    noFresData$CHEM_HRS[noFresData$STU_INST_UID == id 
+    noFresData$CHEM_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "CHEM"])
-    noFresData$MATH_HRS[noFresData$STU_INST_UID == id 
+    noFresData$MATH_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "MATH"])
-    noFresData$CSCI_HRS[noFresData$STU_INST_UID == id 
+    noFresData$CSCI_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "CSCI"])
-    noFresData$ASTR_HRS[noFresData$STU_INST_UID == id 
+    noFresData$ASTR_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "ASTR"])
-    noFresData$ECON_HRS[noFresData$STU_INST_UID == id 
+    noFresData$ECON_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "ECON"])
-    noFresData$ENSC_GEOL_HRS[noFresData$STU_INST_UID == id 
+    noFresData$ENSC_GEOL_VISITS[noFresData$STU_INST_UID == id 
                              & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                     & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "ENSC_GEOL"])
-    noFresData$GC1Y_HRS[noFresData$STU_INST_UID == id 
+    noFresData$GC1Y_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "GC1Y"])
-    noFresData$KINS_HRS[noFresData$STU_INST_UID == id 
+    noFresData$KINS_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "KINS"])
-    noFresData$PHYS_HRS[noFresData$STU_INST_UID == id 
+    noFresData$PHYS_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "PHYS"])
-    noFresData$PSYC_HRS[noFresData$STU_INST_UID == id 
+    noFresData$PSYC_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "PSYC"])
-    noFresData$GEOG_HRS[noFresData$STU_INST_UID == id 
+    noFresData$GEOG_VISITS[noFresData$STU_INST_UID == id 
                         & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "GEOG"])
-    noFresData$SPAN_FREN_HRS[noFresData$STU_INST_UID == id 
+    noFresData$SPAN_FREN_VISITS[noFresData$STU_INST_UID == id 
                              & noFresData$TERM_CODE == term] = sum(noFresData$TOTAL[noFresData$STU_INST_UID == id 
                                                                                     & noFresData$TERM_CODE <= term & noFresData$COURSE_ACRONYM == "SPAN_FREN"])
     noFresData$TOTAL_SIs[noFresData$STU_INST_UID == id 
@@ -523,7 +525,6 @@ noFresData$T1 = 0
 for (id in stu_ids) 
 {
   noFresData$survTime[noFresData$STU_INST_UID == id] = noFresData$survTime[noFresData$STU_INST_UID == id] - min(noFresData$survTime[noFresData$STU_INST_UID == id])
-  noFresData$
 }
 
 noFresData$COURSE_ACRONYM <- NULL
@@ -628,27 +629,36 @@ for(id in ids)
   }
   
 }
-thisData$CHANGED_MAJOR = 1
+
+abc_ids = unique(stemData$STU_INST_UID)
+
+stemData <- thisData[which(thisData$INST_CUM_HRS_ATTEMPTED_LAGGED != 0),]
+
+for (id in abc_ids) 
+{
+  stemData$T1[stemData$STU_INST_UID == id] = stemData$TERM_ORD[stemData$STU_INST_UID == id] - min(stemData$TERM_ORD[noFresData$STU_INST_UID == id])
+}
+
+stemData$CHANGED_MAJOR = 1
 
 for(id in ids)
 {
- sorted = sort(unique(thisData$TERM_ORD[thisData$STU_INST_UID == id], decreasing = TRUE))
+ sorted = sort(unique(stemData$TERM_ORD[stemData$STU_INST_UID == id], decreasing = TRUE))
  max = sorted[1]
  almost_max = sorted[2]
- lastMajor = thisData$MAJOR_DESC[thisData$STU_INST_UID == id & thisData$TERM_ORD == max]
- almostLM = thisData$MAJOR_DESC[thisData$STU_INST_UID == id & thisData$TERM_ORD == almost_max]
+ lastMajor = stemData$MAJOR_DESC[stemData$STU_INST_UID == id & stemData$TERM_ORD == max]
+ almostLM = stemData$MAJOR_DESC[stemData$STU_INST_UID == id & stemData$TERM_ORD == almost_max]
  if ((grepl(almostLM, lastMajor)) | (grepl(almostLM, 'Psychology, General') & grepl(lastMajor, 'Research and Experimental Psyc')) == TRUE)
  {
-  thisData$CHANGED_MAJOR[thisData$STU_INST_UID == id & thisData$TERM_ORD == max] = 0
+  stemData$CHANGED_MAJOR[stemData$STU_INST_UID == id & stemData$TERM_ORD == max] = 0
  }
  else
  {
- thisData$CHANGED_MAJOR[thisData$STU_INST_UID == id & thisData$TERM_ORD == max] = 1
+ stemData$CHANGED_MAJOR[stemData$STU_INST_UID == id & stemData$TERM_ORD == max] = 1
  }
 
 }
 
-stemData <- thisData[which(thisData$INST_CUM_HRS_ATTEMPTED_LAGGED != 0),]
 
 stemData$dropped <- NULL
  stemData$INST_CUM_HRS_EARNED <- NULL
