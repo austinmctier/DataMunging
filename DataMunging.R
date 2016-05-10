@@ -14,8 +14,8 @@ library(survival)
 
 # import datasets
 options(stringsAsFactors = FALSE) # don't coerce strings to factors
-lcdata <- read.csv(file="StudentData.csv", header=T)
-irdata <- read.csv(file="data_0708_1505.csv", header=T)
+lcdata <- read.csv(file="StudentCompiled.csv", header=T)
+irdata <- read.csv(file="data_0902_1508.csv", header=T)
 sidata <- read.csv(file="SiData.csv", header=T)
 
 # drop transfer students
@@ -130,7 +130,7 @@ mergedData$IPEDS_RACE_CODE <- factor(mergedData$IPEDS_RACE_CODE, ordered=FALSE)
 mergedData$IPEDS_RACE_CODE = relevel(mergedData$IPEDS_RACE_CODE,ref='W')
 mergedData$DEPENDENCY_CODE <- factor(mergedData$DEPENDENCY_CODE, ordered=TRUE)
 mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
-mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
+mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="11")
 
 # change NA's in SI_LEADER to "NONE"
 mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
@@ -139,7 +139,10 @@ mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
 mergedData$TOTAL[is.na(mergedData$TOTAL)] <- 0
 mergedData$MEAN[is.na(mergedData$MEAN)] <- 0
 mergedData$MEDIAN[is.na(mergedData$MEDIAN)] <- 0
-mergedData$MAJOR_IND[is.na(mergedData$MAJOR_IND)] <- 14
+mergedData$MAJOR_IND[is.na(mergedData$MAJOR_IND)] <- 11
+
+
+survivalData <- mergedData
 
 # create ordinal variables
 mergedData$FATHER_HIGHEST_GRADE_CODE <- as.numeric(factor(mergedData$FATHER_HIGHEST_GRADE_CODE, 
@@ -342,233 +345,92 @@ PSMData <- mergedData
 
 backupData <- mergedData
 
-# import datasets
-options(stringsAsFactors = FALSE) # don't coerce strings to factors
-lcdata <- read.csv(file="StudentData.csv", header=T)
-irdata <- read.csv(file="data_0708_1505.csv", header=T)
-sidata <- read.csv(file="SiData.csv", header=T)
-
-# drop transfer students
-ftf_ids = unique(irdata$STU_INST_UID[irdata$FTF_IPEDS_IND=='Y'])
-irdata <- irdata[irdata$STU_INST_UID %in% ftf_ids,]
-
-# remove duplicate rows (if any)
-irdata <- irdata[!duplicated(irdata),]
-
-# coerce names to lowercase for consistency
-irdata$FIRST_NAME <- tolower(irdata$FIRST_NAME)
-irdata$LAST_NAME <- tolower(irdata$LAST_NAME)
-lcdata$FIRST_NAME <- tolower(lcdata$FIRST_NAME)
-lcdata$LAST_NAME <- tolower(lcdata$LAST_NAME)
-
-# merge sets (left join)
-dataData <- merge(sidata, lcdata, by=c("TERM_CODE","COURSE_ACRONYM", 
-                                       "COURSE_NUMBER", "COURSE_SEC_IDENTIFIER", 
-                                       "SI_LEADER"), all.y=T, sort=F)
-
-mergedData <- merge(dataData, irdata, by=c("TERM_CODE","COURSE_ACRONYM", 
-                                           "COURSE_NUMBER", "LAST_NAME", 
-                                           "FIRST_NAME"), all.y=T, sort=F)
-
-# clean out environment
-
-
-mergedData$MAJOR_IND[mergedData$MAJOR_DESC == "Research and Experimental Psyc"] = 4
-
-missing_majs = unique(mergedData$STU_INST_UID[is.na(mergedData$MAJOR_DESC) | is.na(mergedData$MAJOR_IND)])
-
-for (id in missing_majs) {
-  majs = mergedData$MAJOR_DESC[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_DESC) == FALSE]
-  majs = majs[order(mergedData$TERM_CODE[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_DESC) == FALSE ],decreasing=TRUE)]
-  
-  maj_inds = mergedData$MAJOR_DESC[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_IND) == FALSE]
-  maj_inds = maj_inds[order(mergedData$TERM_CODE[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_IND) == FALSE ],decreasing=TRUE)]
-  
-  mergedData$MAJOR_IND[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_IND)] =  maj_inds[1]
-  mergedData$MAJOR_DESC[mergedData$STU_INST_UID == id & is.na(mergedData$MAJOR_DESC)] =  majs[1]
-}
-
-# drop unwanted variables
-names(mergedData)[names(mergedData) == 'income_househould_median'] = 'income_household_median'
-
-mergedData$ACTIVITY =  0
-mergedData$ACTIVITY[mergedData$ACTIVITY_NCAA_IND == 1 | mergedData$ACTIVITY_GREEK_IND == 1 | mergedData$ACTIVITY_ACADM_IND == 1] = 1
-mergedData$IPEDS_RACE_CODE[mergedData$IPEDS_RACE_CODE %in% c('I','M','A','P','U','T','U','Z','N')] = 'OTHER'
-# create proportions for population variables
-
-select =  c(
-  'pop_over25','pop_over16','pop','landArea',
-  'GIVE_HRS',
-  'income_household_median',
-  'home_medianValue','pop_black',
-  'ACTIVITY','SUMMER_CNT',
-  'TERM_CODE',
-  'STU_INST_UID',
-  'COURSE_ACRONYM',
-  'COURSE_NUMBER',
-  'STUDENT_LEVEL_NBR',
-  'INST_TERM_HRS_ATTEMPTED',
-  'INST_CUM_HRS_ATTEMPTED',
-  'INST_CUM_GPA',
-  'HS_GPA',
-  'SAT_CRITICAL_READING',
-  'SAT_MATH',
-  'ACT_COMPOSITE',
-  'BRIDGE_IND',
-  'GENDER_CODE',
-  'IPEDS_RACE_CODE',
-  'NN_GRANT',
-  'NR_GRANT',
-  'LOAN',
-  'MAJOR_DESC',
-  'DEPENDENCY_CODE',
-  'STUDENT_OR_PARENT_AGI',
-  'FATHER_HIGHEST_GRADE_CODE',
-  'MOTHER_HIGHEST_GRADE_CODE',
-  'COURSE_ATTEMPTED_HRS',
-  'INST_COURSE_GRADE',
-  'SI_LEADER',
-  'TOTAL',
-  'MEDIAN',
-  'MEAN',
-  'MAJOR_IND',
-  'pop_over25_bachelors',
-  'pop_armedForces',
-  'pop_over25_HSGrad',
-  'AGE',
-  'MAJOR_CHANGES',
-  'TERM_ORD',
-  'INST_CUM_HRS_EARNED',
-  'pop',
-  'COURSE_SEC_IDENTIFIER'
-)
-
-mergedData <- mergedData[,names(mergedData) %in% select]
-
-# drop PHYS2211 and GEOL1121 from term 201208
-mergedData <- mergedData[(mergedData$TERM_CODE == 201208 & 
-                            mergedData$COURSE_ACRONYM =='PHYS' & 
-                            mergedData$COURSE_NUMBER =='2211') == FALSE,]
-mergedData <- mergedData[(mergedData$TERM_CODE == 201208 & 
-                            mergedData$COURSE_ACRONYM == 'GEOL' & 
-                            mergedData$COURSE_NUMBER == '1121') == FALSE,]
-
-
-# drop grades other than A, B, C, D, F
-mergedData <- mergedData[which(mergedData$INST_COURSE_GRADE == 'A' | 
-                                 mergedData$INST_COURSE_GRADE == 'B' | 
-                                 mergedData$INST_COURSE_GRADE == 'C' | 
-                                 mergedData$INST_COURSE_GRADE == 'D' | 
-                                 mergedData$INST_COURSE_GRADE == 'F'),]
-
-# create categorical variables
-mergedData$COURSE_ACRONYM <- factor(mergedData$COURSE_ACRONYM, ordered=FALSE)
-mergedData$COURSE_NUMBER <- factor(mergedData$COURSE_NUMBER, ordered=FALSE)
-mergedData$BRIDGE_IND <- factor(mergedData$BRIDGE_IND, ordered=TRUE)
-mergedData$GENDER_CODE <- factor(mergedData$GENDER_CODE, ordered=TRUE)
-mergedData$IPEDS_RACE_CODE <- factor(mergedData$IPEDS_RACE_CODE, ordered=FALSE)
-mergedData$IPEDS_RACE_CODE = relevel(mergedData$IPEDS_RACE_CODE,ref='W')
-mergedData$DEPENDENCY_CODE <- factor(mergedData$DEPENDENCY_CODE, ordered=TRUE)
-mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
-mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
-
-# change NA's in SI_LEADER to "NONE"
-
-mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
-mergedData$MAJOR_IND <- factor(mergedData$MAJOR_IND, ordered=FALSE)
-mergedData$MAJOR_IND <- relevel(mergedData$MAJOR_IND, ref="14")
-mergedData$MAJOR_IND[is.na(mergedData$MAJOR_IND)] <- 14
-
-# treat nas as zeros
-mergedData$TOTAL[is.na(mergedData$TOTAL)] <- 0
-mergedData$MEAN[is.na(mergedData$MEAN)] <- 0
-mergedData$MEDIAN[is.na(mergedData$MEDIAN)] <- 0
 
 # create ordinal variables
-mergedData$STUDENT_LEVEL_NBR <- as.numeric(factor(mergedData$STUDENT_LEVEL_NBR, 
+survivalData$STUDENT_LEVEL_NBR <- as.numeric(factor(survivalData$STUDENT_LEVEL_NBR, 
                                                   levels=c(10,20,30,40), 
                                                   ordered=TRUE))
-mergedData$FATHER_HIGHEST_GRADE_CODE <- as.numeric(factor(mergedData$FATHER_HIGHEST_GRADE_CODE, 
+survivalData$FATHER_HIGHEST_GRADE_CODE <- as.numeric(factor(survivalData$FATHER_HIGHEST_GRADE_CODE, 
                                                           levels=c(NA,1,2,3,4), 
                                                           ordered=TRUE))
-mergedData$MOTHER_HIGHEST_GRADE_CODE <- as.numeric(factor(mergedData$MOTHER_HIGHEST_GRADE_CODE, 
+survivalData$MOTHER_HIGHEST_GRADE_CODE <- as.numeric(factor(survivalData$MOTHER_HIGHEST_GRADE_CODE, 
                                                           levels=c(NA,1,2,3,4), 
                                                           ordered=TRUE))
-mergedData$INST_COURSE_GRADE <- as.numeric(factor(mergedData$INST_COURSE_GRADE, 
+survivalData$INST_COURSE_GRADE <- as.numeric(factor(survivalData$INST_COURSE_GRADE, 
                                                   levels=c('F','D','C','B','A'), 
                                                   ordered=TRUE))
 
-mergedData$pop_over25_HSGrad <- mergedData$pop_over25_HSGrad/mergedData$pop_over25
-mergedData$pop_over25_bachelors <- mergedData$pop_over25_bachelors/mergedData$pop_over25
-mergedData$pop_armedForces <- mergedData$pop_armedForces/mergedData$pop_over16
-mergedData$pop_density <- mergedData$pop/mergedData$landArea
+survivalData$pop_over25_HSGrad <- survivalData$pop_over25_HSGrad/survivalData$pop_over25
+survivalData$pop_over25_bachelors <- survivalData$pop_over25_bachelors/survivalData$pop_over25
+survivalData$pop_armedForces <- survivalData$pop_armedForces/survivalData$pop_over16
+survivalData$pop_density <- survivalData$pop/survivalData$landArea
 
 
-mergedData$BIOL_HRS = 0
-mergedData$CHEM_HRS = 0
-mergedData$MATH_HRS = 0
-mergedData$CSCI_HRS = 0
-mergedData$ASTR_HRS = 0
-mergedData$ECON_HRS = 0
-mergedData$ENSC_GEOL_HRS = 0
-mergedData$GC1Y_HRS = 0
-mergedData$KINS_HRS = 0
-mergedData$PHYS_HRS = 0
-mergedData$SPAN_FREN_HRS = 0
-mergedData$PSYC_HRS = 0
-mergedData$GEOG_HRS = 0
+survivalData$BIOL_VISITS = 0
+survivalData$CHEM_VISITS = 0
+survivalData$MATH_VISITS = 0
+survivalData$CSCI_VISITS = 0
+survivalData$ASTR_VISITS = 0
+survivalData$ECON_VISITS = 0
+survivalData$ENSC_GEOL_VISITS = 0
+survivalData$GC1Y_VISITS = 0
+survivalData$KINS_VISITS = 0
+survivalData$PHYS_VISITS = 0
+survivalData$SPAN_FREN_VISITS = 0
+survivalData$PSYC_VISITS = 0
+survivalData$GEOG_VISITS = 0
 
 
 
-mergedData$INST_COURSE_GRADE <- mergedData$INST_COURSE_GRADE - 1
+survivalData$INST_COURSE_GRADE <- survivalData$INST_COURSE_GRADE - 1
 
-mergedData$Quality_Points = mergedData$COURSE_ATTEMPTED_HRS*mergedData$INST_COURSE_GRADE
-View(mergedData)
-for(i in 1:nrow(mergedData))
-  mergedData[i, 'uniq_stu_id'] = paste(mergedData[i, 'STU_INST_UID'], mergedData[i,'TERM_CODE'])
+survivalData$Quality_Points = survivalData$COURSE_ATTEMPTED_HRS*survivalData$INST_COURSE_GRADE
+
+for(i in 1:nrow(survivalData))
+  survivalData[i, 'uniq_stu_id'] = paste(survivalData[i, 'STU_INST_UID'], survivalData[i,'TERM_CODE'])
 remove(i)
-uniq_stu_ids <- unique(mergedData$uniq_stu_id)
-mergedData$TOTAL_QUALITY_POINTS = 0
+uniq_stu_ids <- unique(survivalData$uniq_stu_id)
+survivalData$TOTAL_QUALITY_POINTS = 0
 for(uniq_stu_id in uniq_stu_ids)
 {
-  mergedData$TOTAL_QUALITY_POINTS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$Quality_Points
-                                                                               [mergedData$uniq_stu_id == uniq_stu_id])
+  survivalData$TOTAL_QUALITY_POINTS[survivalData$uniq_stu_id == uniq_stu_id] = sum(survivalData$Quality_Points
+                                                                               [survivalData$uniq_stu_id == uniq_stu_id])
   
 }
 for(uniq_stu_id in uniq_stu_ids)
 {
-  mergedData$TOTAL_CRSE_ATMP_HRS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$COURSE_ATTEMPTED_HRS[mergedData$uniq_stu_id == uniq_stu_id])
+  survivalData$TOTAL_CRSE_ATMP_HRS[survivalData$uniq_stu_id == uniq_stu_id] = sum(survivalData$COURSE_ATTEMPTED_HRS[survivalData$uniq_stu_id == uniq_stu_id])
   }
 
-mergedData$ANY_SI = 0 
-mergedData$NUM_OF_SI_LEADERS = 0
+survivalData$ANY_SI = 0 
+survivalData$NUM_OF_SI_LEADERS = 0
 
 
-for(i in 1:length(mergedData$SI))
+for(i in 1:length(survivalData$SI))
 {
-  if(mergedData$SI_LEADER[i] != "NONE")
-    mergedData$ANY_SI[i] = 1
+  if(survivalData$SI_LEADER[i] != "NONE")
+    survivalData$ANY_SI[i] = 1
 }
 
 
 
 for(uniq_stu_id in uniq_stu_ids)
 {
-  mergedData$NUM_OF_SI_LEADERS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$ANY_SI[mergedData$uniq_stu_id == uniq_stu_id])
+  survivalData$NUM_OF_SI_LEADERS[survivalData$uniq_stu_id == uniq_stu_id] = sum(survivalData$ANY_SI[survivalData$uniq_stu_id == uniq_stu_id])
 }
 
 for(uniq_stu_id in uniq_stu_ids)
 {
-  mergedData$TOTAL_VISITS[mergedData$uniq_stu_id == uniq_stu_id] = sum(mergedData$TOTAL[mergedData$uniq_stu_id == uniq_stu_id])
+  survivalData$TOTAL_VISITS[survivalData$uniq_stu_id == uniq_stu_id] = sum(survivalData$TOTAL[survivalData$uniq_stu_id == uniq_stu_id])
 }
 
 
 
-mergedData$TERM_GPA = 0
+survivalData$TERM_GPA = 0
   
-mergedData$TERM_GPA = mergedData$TOTAL_QUALITY_POINTS / mergedData$TOTAL_CRSE_ATMP_HRS
+survivalData$TERM_GPA = survivalData$TOTAL_QUALITY_POINTS / survivalData$TOTAL_CRSE_ATMP_HRS
 
-pracData = mergedData
+pracData = survivalData
 pracData$COURSE_ACRONYM = as.character(pracData$COURSE_ACRONYM)
 for(i in 1:length(pracData$COURSE_ACRONYM))
 {
