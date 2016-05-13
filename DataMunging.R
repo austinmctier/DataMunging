@@ -628,9 +628,9 @@ for(id in ids)
   
 }
 
-abc_ids = unique(stemData$STU_INST_UID)
-
 stemData <- thisData[which(thisData$INST_CUM_HRS_ATTEMPTED_LAGGED != 0),]
+
+abc_ids = unique(stemData$STU_INST_UID)
 
 for (id in abc_ids) 
 {
@@ -639,13 +639,13 @@ for (id in abc_ids)
 
 stemData$CHANGED_MAJOR = 1
 
-for(id in ids)
+for(id in abc_ids)
 {
  sorted = sort(unique(stemData$TERM_ORD[stemData$STU_INST_UID == id], decreasing = TRUE))
  max = sorted[1]
  almost_max = sorted[2]
- lastMajor = stemData$MAJOR_DESC[stemData$STU_INST_UID == id & stemData$TERM_ORD == max]
- almostLM = stemData$MAJOR_DESC[stemData$STU_INST_UID == id & stemData$TERM_ORD == almost_max]
+ lastMajor = unique(stemData$MAJOR_DESC[stemData$STU_INST_UID == id & stemData$TERM_ORD == max])
+ almostLM = unique(stemData$MAJOR_DESC[stemData$STU_INST_UID == id & stemData$TERM_ORD == almost_max])
  if ((grepl(almostLM, lastMajor)) | (grepl(almostLM, 'Psychology, General') & grepl(lastMajor, 'Research and Experimental Psyc')) == TRUE)
  {
   stemData$CHANGED_MAJOR[stemData$STU_INST_UID == id & stemData$TERM_ORD == max] = 0
