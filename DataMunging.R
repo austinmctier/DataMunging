@@ -408,11 +408,13 @@ survivalData$ANY_SI = 0
 survivalData$NUM_OF_SI_LEADERS = 0
 
 
-for(i in 1:length(survivalData$SI))
-{
-  if(survivalData$SI_LEADER[i] != "NONE")
-    survivalData$ANY_SI[i] = 1
-}
+for(i in 1:length(survivalData$SI_LEADER))
+           {
+                       if(is.na(survivalData$SI_LEADER[i]))
+                                   survivalData$ANY_SI[i]= 0
+                      else
+                            survivalData$ANY_SI[i] = 1
+                         }
 
 
 
@@ -451,15 +453,19 @@ table(pracData$COURSE_ACRONYM,useNA = 'ifany')
 pracData$TERM_CODE = as.numeric(pracData$TERM_CODE)
 pracData = pracData[order(pracData$TERM_ORD),]
 
+pracData$SI_LEADER = as.character(pracData$SI_LEADER)
+ for(i in 1:length(pracData$SI_LEADER))
+ {
+     if(is.na(pracData$SI_LEADER[i]))
+         pracData$SI_LEADER[i]="NONE"
+ }
+ 
+
 treated_ids = unique(pracData$STU_INST_UID[pracData$SI_LEADER != 'NONE'])
 pracData = pracData[pracData$STU_INST_UID %in% treated_ids,]
 
-table(pracData$INST_CUM_HRS_ATTEMPTED, useNA = 'ifany')
-table(pracData$INST_CUM_GPA, useNA = 'ifany')
-table(pracData$MAJOR_CHANGES, useNA = 'ifany') 
-table(pracData$INST_CUM_HRS_EARNED, useNA = 'ifany')
-
-
+mergedData$SI_LEADER <- factor(mergedData$SI_LEADER, ordered=FALSE)
+mergedData$SI_LEADER <- relevel(mergedData$SI_LEADER, ref="NONE")
 
 noFresData = pracData[which(pracData$INST_CUM_HRS_EARNED > 29),]
 
@@ -518,14 +524,6 @@ for(id in ids)
   
 }
 
-stu_ids = unique(noFresData$STU_INST_UID)
-noFresData$survTime = noFresData$TERM_ORD
-noFresData$T1 = 0
-
-for (id in stu_ids) 
-{
-  noFresData$survTime[noFresData$STU_INST_UID == id] = noFresData$survTime[noFresData$STU_INST_UID == id] - min(noFresData$survTime[noFresData$STU_INST_UID == id])
-}
 
 noFresData$COURSE_ACRONYM <- NULL
 noFresData$COURSE_NUMBER <- NULL
@@ -666,8 +664,11 @@ stemData$INST_CUM_GPA <- NULL
  stemData$INST_CUM_HRS_ATTEMPTED <- NULL
  stemData$BRIDGE_IND <- NULL
 
+myFunction <- function(stemData)
+{
+
 imputedData <- amelia(
-    x=mergedData,
+    x=stemData,
     m=1,
     logs=c(
         'STUDENT_OR_PARENT_AGI',
@@ -675,8 +676,8 @@ imputedData <- amelia(
         'home_medianValue','pop','landArea','pop_over25','pop_over16'
     ),
     sqrts=c(
-        'INST_CUM_HRS_ATTEMPTED',
-        'INST_CUM_HRS_EARNED'
+        'INST_CUM_HRS_ATTEMPTED_LAGGED',
+        'INST_CUM_HRS_EARNED_LAGGED'
     ),
     nom=c(
         'BRIDGE_IND',
