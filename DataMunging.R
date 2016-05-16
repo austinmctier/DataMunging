@@ -538,6 +538,7 @@ noFresData$COURSE_SEC_IDENTIFIER <- NULL
 noFresData$Quality_Points <- NULL
 noFresData$SI_LEADER <- NULL
 noFresData$ANY_SI <- NULL
+noFresData$ACTIVITY <- NULL
 noFresData <- noFresData[!duplicated(noFresData),]
 
 ids = unique(noFresData$STU_INST_UID)
