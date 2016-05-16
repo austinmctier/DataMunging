@@ -668,44 +668,6 @@ myFunction <- function(stemData)
 {
 
 imputedData <- amelia(
-    x=stemData,
-    m=1,
-    logs=c(
-        'STUDENT_OR_PARENT_AGI',
-        'income_household_median',
-        'home_medianValue','pop','landArea','pop_over25','pop_over16'
-    ),
-    sqrts=c(
-        'INST_CUM_HRS_ATTEMPTED_LAGGED',
-        'INST_CUM_HRS_EARNED_LAGGED'
-    ),
-    nom=c(
-        'BRIDGE_IND',
-        'GENDER_CODE',
-        'NR_GRANT',
-        'NN_GRANT',
-        'IPEDS_RACE_CODE',
-        'DEPENDENCY_CODE',
-        'ACTIVITY'
-    ),
-    ords=c(
-        'FATHER_HIGHEST_GRADE_CODE',
-        'MOTHER_HIGHEST_GRADE_CODE',
-        'INST_COURSE_GRADE'
-    ),
-    idvars=c(
-        'MAJOR_DESC',
-        'TERM_CODE',
-        'TERM_ORD',
-        'COURSE_ACRONYM',
-        'COURSE_NUMBER',
-        'COURSE_SEC_IDENTIFIER',
-        'STU_INST_UID',
-       
-    )
-)
-
-imputedData <- amelia(
               x=stemData,
               m=1,
               logs=c(
@@ -740,20 +702,20 @@ imputedData <- amelia(
            stemData <- imputedData$imputations[[1]]
   remove(imputedData)
   
-  PSM_ids = unique(PSMData$STU_INST_UID)
+  stemData$pop_over25_HSGrad <- stemData$pop_over25_HSGrad/stemData$pop_over25
+stemData$pop_over25_bachelors <- stemData$pop_over25_bachelors/stemData$pop_over25
+stemData$pop_armedForces <- stemData$pop_armedForces/stemData$pop_over16
+stemData$pop_black <- stemData$pop_black/ (stemData$pop)
+stemData$pop <- stemData$pop/stemData$landArea*2.59e+6
   
-  workData = stemData[stemData$STU_INST_UID %in% PSM_ids,]
+  my.surv <- Surv(stemData$T1, stemData$CHANGED_MAJOR)
+  coxph.fit <- coxph(my.surv ~ , method = "breslow", data=stemData)
   
   
   
-#attach(stemData)
-#my.surv <- Surv(stemData$survTime, stemData$MAJOR_CHANGES)
-#coxph.fit <- coxph(my.surv ~ , method = "breslow", data=stemData)
-#
-#
-#
-#
-#
+ } 
+  
+
 #
 #
 #
